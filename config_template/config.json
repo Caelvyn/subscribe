@@ -1,0 +1,871 @@
+{
+  "log": {
+    "disabled": false,
+    "level": "info",
+    "output": "sing-box.log",
+    "timestamp": true
+  },
+  "experimental": {
+    "clash_api": {
+      "external_controller": "0.0.0.0:9999",
+      "external_ui": "ui",
+      "external_ui_download_url": "",
+      "external_ui_download_detour": "🎯 全球直连",
+      "secret": "singbox",
+      "default_mode": "rule",
+      "access_control_allow_origin": [
+        "*"
+      ],
+      "access_control_allow_private_network": false
+    },
+    "cache_file": {
+      "enabled": true,
+      "path": "cache.db",
+      "cache_id": "ID_9il7u36n",
+      "store_fakeip": true,
+      "rdrc_timeout": "7d"
+    }
+  },
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "::",
+      "listen_port": 7080
+    },
+    {
+      "type": "tproxy",
+      "tag": "tproxy-in",
+      "listen": "::",
+      "listen_port": 1536
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "selector",
+      "tag": "🚀 节点选择",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🎈 自动选择",
+        "剩余流量：43.78 GB",
+        "距离下次重置剩余：18 天",
+        "套餐到期：2026-05-27",
+        "过滤掉5条线路",
+        "香港-1",
+        "香港-2",
+        "香港-3",
+        "香港-4",
+        "新加坡-1",
+        "新加坡-2",
+        "新加坡-3",
+        "新加坡-4",
+        "日本-1",
+        "日本-2",
+        "日本-3",
+        "日本-4",
+        "台湾-1",
+        "台湾-2",
+        "台湾-3",
+        "台湾-4",
+        "美国-1",
+        "美国-2",
+        "美国-3",
+        "美国-4",
+        "Trojan-香港2 | 低倍率",
+        "Trojan-新加坡2 | 低倍率",
+        "Trojan-日本2 | 低倍率",
+        "Trojan-美国2 | 低倍率",
+        "Trojan-台湾2 | 低倍率",
+        "Trojan-加拿大2 | 低倍率",
+        "俄罗斯",
+        "韩国",
+        "英国",
+        "马来西亚",
+        "菲律宾",
+        "加拿大",
+        "阿根廷",
+        "印度",
+        "墨西哥",
+        "澳大利亚",
+        "土耳其",
+        "越南",
+        "巴西",
+        "南非",
+        "缅甸",
+        "乌克兰",
+        "新西兰",
+        "以色列",
+        "印度尼西亚",
+        "格陵兰岛",
+        "冰岛",
+        "加纳"
+      ]
+    },
+    {
+      "type": "urltest",
+      "tag": "🎈 自动选择",
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "3m",
+      "tolerance": 150,
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "剩余流量：43.78 GB",
+        "距离下次重置剩余：18 天",
+        "套餐到期：2026-05-27",
+        "过滤掉5条线路",
+        "香港-1",
+        "香港-2",
+        "香港-3",
+        "香港-4",
+        "新加坡-1",
+        "新加坡-2",
+        "新加坡-3",
+        "新加坡-4",
+        "日本-1",
+        "日本-2",
+        "日本-3",
+        "日本-4",
+        "台湾-1",
+        "台湾-2",
+        "台湾-3",
+        "台湾-4",
+        "美国-1",
+        "美国-2",
+        "美国-3",
+        "美国-4",
+        "Trojan-香港2 | 低倍率",
+        "Trojan-新加坡2 | 低倍率",
+        "Trojan-日本2 | 低倍率",
+        "Trojan-美国2 | 低倍率",
+        "Trojan-台湾2 | 低倍率",
+        "Trojan-加拿大2 | 低倍率",
+        "俄罗斯",
+        "韩国",
+        "英国",
+        "马来西亚",
+        "菲律宾",
+        "加拿大",
+        "阿根廷",
+        "印度",
+        "墨西哥",
+        "澳大利亚",
+        "土耳其",
+        "越南",
+        "巴西",
+        "南非",
+        "缅甸",
+        "乌克兰",
+        "新西兰",
+        "以色列",
+        "印度尼西亚",
+        "格陵兰岛",
+        "冰岛",
+        "加纳"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "🎯 全球直连",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "direct",
+        "block"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "🛑 全球拦截",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "block",
+        "direct"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "🐟 漏网之鱼",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🚀 节点选择",
+        "🎯 全球直连"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "GLOBAL",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🚀 节点选择",
+        "🎈 自动选择",
+        "🎯 全球直连",
+        "🛑 全球拦截",
+        "🐟 漏网之鱼"
+      ]
+    },
+    {
+      "tag": "剩余流量：43.78 GB",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50001,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "距离下次重置剩余：18 天",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50001,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "套餐到期：2026-05-27",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50001,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "过滤掉5条线路",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50001,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "香港-1",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50001,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "香港-2",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50002,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "香港-3",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50003,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "香港-4",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50004,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "新加坡-1",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50005,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "新加坡-2",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50006,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "新加坡-3",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50007,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "新加坡-4",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50008,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "日本-1",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50009,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "日本-2",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50010,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "日本-3",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50011,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "日本-4",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50012,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "台湾-1",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50013,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "台湾-2",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50014,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "台湾-3",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50015,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "台湾-4",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50016,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "美国-1",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50017,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "美国-2",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50018,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "美国-3",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50019,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "美国-4",
+      "type": "shadowsocks",
+      "server": "lh2.cac.cab",
+      "server_port": 50020,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "Trojan-香港2 | 低倍率",
+      "type": "trojan",
+      "server": "819545f7ede819185707662e5d6685b6.lh.gtm.cac.cab",
+      "server_port": 44277,
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97",
+      "tls": {
+        "enabled": true,
+        "server_name": "tchk1.bilibili.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "tag": "Trojan-新加坡2 | 低倍率",
+      "type": "trojan",
+      "server": "e80f2788d00b1a4ce08929d830293560.lh.gtm.cac.cab",
+      "server_port": 45953,
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97",
+      "tls": {
+        "enabled": true,
+        "server_name": "tcsg1.bilibili.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "tag": "Trojan-日本2 | 低倍率",
+      "type": "trojan",
+      "server": "7a200699bcb876c059c436b95201e5c6.lh.gtm.cac.cab",
+      "server_port": 49066,
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97",
+      "tls": {
+        "enabled": true,
+        "server_name": "tcjp1.bilibili.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "tag": "Trojan-美国2 | 低倍率",
+      "type": "trojan",
+      "server": "8ce5f32879fbe6249d7c6b922636c28b.lh.gtm.cac.cab",
+      "server_port": 41123,
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97",
+      "tls": {
+        "enabled": true,
+        "server_name": "tcus1.bilibili.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "tag": "Trojan-台湾2 | 低倍率",
+      "type": "trojan",
+      "server": "909c54c5cb3436025ec49ac5c3031b08.lh.gtm.cac.cab",
+      "server_port": 43383,
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97",
+      "tls": {
+        "enabled": true,
+        "server_name": "tctw1.bilibili.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "tag": "Trojan-加拿大2 | 低倍率",
+      "type": "trojan",
+      "server": "3dfcafa0155567c6ae8c0d5ef018252e.lh.gtm.cac.cab",
+      "server_port": 46199,
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97",
+      "tls": {
+        "enabled": true,
+        "server_name": "tcca1.bilibili.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "tag": "俄罗斯",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54500,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "韩国",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54501,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "英国",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54502,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "马来西亚",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54503,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "菲律宾",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54504,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "加拿大",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54505,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "阿根廷",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54506,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "印度",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54507,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "墨西哥",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54508,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "澳大利亚",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54509,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "土耳其",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54510,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "越南",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54512,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "巴西",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54513,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "南非",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54514,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "缅甸",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54516,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "乌克兰",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54519,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "新西兰",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54522,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "以色列",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54529,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "印度尼西亚",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54531,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "格陵兰岛",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54532,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "冰岛",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54560,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "tag": "加纳",
+      "type": "shadowsocks",
+      "server": "add.lh.cac.cab",
+      "server_port": 54563,
+      "method": "aes-128-gcm",
+      "password": "4186f09c-66b5-4a62-a11c-652cdc1f2b97"
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    },
+    {
+      "type": "block",
+      "tag": "block"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "action": "sniff"
+      },
+      {
+        "action": "hijack-dns",
+        "protocol": "dns"
+      },
+      {
+        "action": "route",
+        "clash_mode": "direct",
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "clash_mode": "global",
+        "outbound": "GLOBAL"
+      },
+      {
+        "action": "route",
+        "network": "icmp",
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "protocol": "quic",
+        "outbound": "🛑 全球拦截"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "Category-Ads"
+        ],
+        "outbound": "🛑 全球拦截"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoSite-Private"
+        ],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoSite-CN"
+        ],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoIP-Private"
+        ],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoIP-CN"
+        ],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoLocation-!CN"
+        ],
+        "outbound": "🚀 节点选择"
+      }
+    ],
+    "rule_set": [
+      {
+        "tag": "Category-Ads",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoIP-Private",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoSite-Private",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoIP-CN",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoSite-CN",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoLocation-!CN",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      }
+    ],
+    "auto_detect_interface": true,
+    "find_process": true,
+    "final": "🐟 漏网之鱼",
+    "default_domain_resolver": {
+      "server": "Local-DNS"
+    }
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "Fake-IP",
+        "type": "fakeip",
+        "inet4_range": "198.18.0.0/15",
+        "inet6_range": "fc00::/18"
+      },
+      {
+        "tag": "Local-DNS",
+        "type": "https",
+        "domain_resolver": "Local-DNS-Resolver",
+        "server_port": 443,
+        "server": "223.5.5.5",
+        "path": "/dns-query"
+      },
+      {
+        "tag": "Local-DNS-Resolver",
+        "type": "udp",
+        "server_port": 53,
+        "server": "223.5.5.5"
+      },
+      {
+        "tag": "Remote-DNS",
+        "type": "https",
+        "detour": "🚀 节点选择",
+        "domain_resolver": "Remote-DNS-Resolver",
+        "server_port": 443,
+        "server": "8.8.8.8",
+        "path": "/dns-query"
+      },
+      {
+        "tag": "Remote-DNS-Resolver",
+        "type": "udp",
+        "detour": "🚀 节点选择",
+        "server_port": 53,
+        "server": "8.8.8.8"
+      }
+    ],
+    "rules": [
+      {
+        "action": "route",
+        "clash_mode": "direct",
+        "server": "Local-DNS"
+      },
+      {
+        "action": "route",
+        "clash_mode": "global",
+        "server": "Remote-DNS"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoSite-CN"
+        ],
+        "server": "Local-DNS"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoLocation-!CN"
+        ],
+        "server": "Remote-DNS"
+      }
+    ],
+    "disable_cache": false,
+    "disable_expire": false,
+    "independent_cache": false,
+    "final": "Remote-DNS"
+  }
+}
