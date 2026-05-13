@@ -13,9 +13,7 @@
       "external_ui_download_detour": "🎯 全球直连",
       "secret": "singbox",
       "default_mode": "rule",
-      "access_control_allow_origin": [
-        "*"
-      ],
+      "access_control_allow_origin": ["*"],
       "access_control_allow_private_network": false
     },
     "cache_file": {
@@ -30,9 +28,7 @@
     {
       "type": "wireguard",
       "tag": "wg-home",
-      "address": [
-        "10.0.0.2/32"
-      ],
+      "address": ["10.0.0.2/32"],
       "private_key": "eH5XpfhZAtbfbL4d+ecIVseAYJL+pDHA2A4ydTmCf18=",
       "peers": [
         {
@@ -40,9 +36,7 @@
           "port": 51820,
           "public_key": "eOUu7wngJZQOC5iokTiz/NnF6LWcXLjlJquXy7CnIU8=",
           "pre_shared_key": "PMb7+BPa3uNjIMoKu+AJ53dT6n8KLc8/ju9i5VaLPvg=",
-          "allowed_ips": [
-            "0.0.0.0/0"
-          ],
+          "allowed_ips": ["0.0.0.0/0"],
           "persistent_keepalive_interval": 25
         }
       ],
@@ -68,10 +62,7 @@
       "type": "selector",
       "tag": "🚀 节点选择",
       "interrupt_exist_connections": true,
-      "outbounds": [
-        "🎈 自动选择",
-        "{all}"
-      ]
+      "outbounds": ["🎈 自动选择", "{all}"]
     },
     {
       "type": "urltest",
@@ -80,49 +71,31 @@
       "interval": "3m",
       "tolerance": 150,
       "interrupt_exist_connections": true,
-      "outbounds": [
-        "{all}"
-      ],
+      "outbounds": ["{all}"],
       "filter": [
         {
           "action": "exclude",
-          "keywords": [
-            "剩余|到期|距离|过滤"
-          ]
+          "keywords": ["剩余|到期|距离|过滤"]
         }
       ]
-    },
-    {
-      "type": "direct",
-      "tag": "🏠 家里 (WireGuard)",
-      "endpoint": "wg-home"
     },
     {
       "type": "selector",
       "tag": "🎯 全球直连",
       "interrupt_exist_connections": true,
-      "outbounds": [
-        "direct",
-        "block"
-      ]
+      "outbounds": ["direct", "block"]
     },
     {
       "type": "selector",
       "tag": "🛑 全球拦截",
       "interrupt_exist_connections": true,
-      "outbounds": [
-        "block",
-        "direct"
-      ]
+      "outbounds": ["block", "direct"]
     },
     {
       "type": "selector",
       "tag": "🐟 漏网之鱼",
       "interrupt_exist_connections": true,
-      "outbounds": [
-        "🚀 节点选择",
-        "🎯 全球直连"
-      ]
+      "outbounds": ["🚀 节点选择", "🎯 全球直连"]
     },
     {
       "type": "selector",
@@ -130,7 +103,7 @@
       "interrupt_exist_connections": true,
       "outbounds": [
         "🚀 节点选择",
-        "🏠 家里 (WireGuard)",
+        "🎈 自动选择",
         "🎯 全球直连",
         "🛑 全球拦截",
         "🐟 漏网之鱼"
@@ -171,11 +144,8 @@
       },
       {
         "action": "route",
-        "ip_cidr": [
-          "10.0.0.0/24",
-          "192.168.1.0/24"
-        ],
-        "outbound": "🏠 家里 (WireGuard)"
+        "ip_cidr": ["10.0.0.0/24", "192.168.1.0/24"],
+        "outbound": "wg-home"
       },
       {
         "action": "route",
@@ -184,26 +154,32 @@
       },
       {
         "action": "route",
-        "rule_set": [
-          "Category-Ads"
-        ],
+        "rule_set": ["Category-Ads"],
         "outbound": "🛑 全球拦截"
       },
       {
         "action": "route",
-        "rule_set": [
-          "GeoSite-Private",
-          "GeoIP-Private",
-          "GeoSite-CN",
-          "GeoIP-CN"
-        ],
+        "rule_set": ["GeoSite-Private"],
         "outbound": "🎯 全球直连"
       },
       {
         "action": "route",
-        "rule_set": [
-          "GeoLocation-!CN"
-        ],
+        "rule_set": ["GeoSite-CN"],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": ["GeoIP-Private"],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": ["GeoIP-CN"],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": ["GeoLocation-!CN"],
         "outbound": "🚀 节点选择"
       }
     ],
@@ -310,16 +286,12 @@
       },
       {
         "action": "route",
-        "rule_set": [
-          "GeoSite-CN"
-        ],
+        "rule_set": ["GeoSite-CN"],
         "server": "Local-DNS"
       },
       {
         "action": "route",
-        "rule_set": [
-          "GeoLocation-!CN"
-        ],
+        "rule_set": ["GeoLocation-!CN"],
         "server": "Remote-DNS"
       }
     ],
