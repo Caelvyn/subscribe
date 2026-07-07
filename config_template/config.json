@@ -62,7 +62,7 @@
       "type": "selector",
       "tag": "🚀 节点选择",
       "interrupt_exist_connections": true,
-      "outbounds": ["🎈 自动选择", "{all}"]
+      "outbounds": ["🎈 自动选择", "{all}","socks-out"]
     },
     {
       "type": "urltest",
