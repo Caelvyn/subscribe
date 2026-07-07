@@ -116,6 +116,17 @@
     {
       "type": "block",
       "tag": "block"
+    },
+    {
+      "type": "socks",
+      "tag": "socks-out",
+      "server": "pr.oxylabs.io",
+      "server_port": 7777,
+      "username": "customer-eqwe2e_K8ovh-cc-de-city-berlin-sessid-0724442428-sesstime-1440",
+      "password": "EeEe2323++++",
+      "network": "tcp",
+      "udp_over_tcp": false,
+      "detour": "🎈 自动选择"
     }
   ],
   "route": {
