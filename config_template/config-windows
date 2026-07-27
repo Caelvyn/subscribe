@@ -1,0 +1,2377 @@
+
+{
+  "log": {
+    "disabled": false,
+    "level": "info",
+    "output": "sing-box.log",
+    "timestamp": true
+  },
+  "experimental": {
+    "clash_api": {
+      "external_controller": "0.0.0.0:9999",
+      "external_ui": "ui",
+      "external_ui_download_url": "",
+      "external_ui_download_detour": "🎯 全球直连",
+      "secret": "singbox",
+      "default_mode": "rule",
+      "access_control_allow_origin": [
+        "*"
+      ],
+      "access_control_allow_private_network": false
+    },
+    "cache_file": {
+      "enabled": true,
+      "path": "cache.db",
+      "cache_id": "ID_9il7u36n",
+      "store_fakeip": true,
+      "rdrc_timeout": "7d"
+    }
+  },
+  "endpoints": [
+    {
+      "type": "wireguard",
+      "tag": "wg-home",
+      "address": [
+        "10.0.0.2/32"
+      ],
+      "private_key": "eH5XpfhZAtbfbL4d+ecIVseAYJL+pDHA2A4ydTmCf18=",
+      "peers": [
+        {
+          "address": "424212.xyz",
+          "port": 51820,
+          "public_key": "eOUu7wngJZQOC5iokTiz/NnF6LWcXLjlJquXy7CnIU8=",
+          "pre_shared_key": "PMb7+BPa3uNjIMoKu+AJ53dT6n8KLc8/ju9i5VaLPvg=",
+          "allowed_ips": [
+            "0.0.0.0/0"
+          ],
+          "persistent_keepalive_interval": 25
+        }
+      ],
+      "mtu": 1280
+    }
+  ],
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "::",
+      "listen_port": 7080
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "selector",
+      "tag": "🚀 节点选择",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🎈 自动选择",
+        "剩余流量：1056.94 GB",
+        "距离下次重置剩余：30 天",
+        "套餐到期：2026-08-26",
+        "🇹🇼 台湾[2.4x]-豪华家宽A1",
+        "🇹🇼 台湾[2.4x]-豪华家宽A2",
+        "🇹🇼 台湾[2.4x]-豪华家宽A3",
+        "🇹🇼 台湾[2.3x]-豪华家宽B1",
+        "🇹🇼 台湾[2.3x]-豪华家宽B2",
+        "🇭🇰 香港[2.4x]-电信豪华1",
+        "🇭🇰 香港[2.4x]-电信豪华2",
+        "🇭🇰 香港[3x]-豪华1",
+        "🇭🇰 香港[3x]-移动豪华1",
+        "🇭🇰 香港[15x]-专线A",
+        "🇭🇰 香港[12x]-CMI2",
+        "🇭🇰 香港[12x]-CMI1",
+        "🇭🇰 香港[20x]-专线B",
+        "🇭🇰 香港[18x]-专线C-CN2",
+        "🇯🇵 日本[15x]-联移专线",
+        "🇯🇵 日本[6.5x]-豪华IIJ-1",
+        "🇯🇵 日本[6.5x]-豪华B",
+        "🇯🇵 日本[6.2x]-豪华A",
+        "🇯🇵 日本[6.5x]-豪华IIJ-2",
+        "🇯🇵 日本[6x]-IIJ-B",
+        "🇸🇬 新加坡[6.2x]-豪华",
+        "🇸🇬 新加坡[17x]-电联专线",
+        "🇰🇷 韩国[5x]-电移豪华",
+        "🇰🇷 韩国[7x]-豪华A1",
+        "🇰🇷 韩国[7x]-豪华A2",
+        "🇺🇸 美国[16x]-专线",
+        "🇭🇰 美国[12x]-9929/CMI2-联移豪华",
+        "🇺🇸 美国[12x]-CN2-电信豪华",
+        "🇭🇰 荷兰[20x]-专线-CN2/CMIN2/9929",
+        "🇹🇼 台湾[17x]-电联专线",
+        "🇲🇴 澳门[4x]-移动优化",
+        "🇹🇼 台湾[2.4x]-高端家宽A1",
+        "🇹🇼 台湾[2.4x]-高端家宽A2",
+        "🇹🇼 台湾[2.4x]-高端家宽A3",
+        "🇹🇼 台湾[2.3x]-高端家宽B1",
+        "🇹🇼 台湾[2.3x]-高端家宽B2",
+        "🇹🇼 台湾[2.3x]-高端家宽B3",
+        "🇭🇰 香港[2.4x]-高端A1",
+        "🇭🇰 香港[2.4x]-高端A2",
+        "🇭🇰 香港[2.4x]-高端A3",
+        "🇭🇰 香港[2.8x]-高端B1",
+        "🇭🇰 香港[2.8x]-移动高端",
+        "🇯🇵 日本[2.4x]-移动高端",
+        "🇯🇵 日本[2.5x]-高端1",
+        "🇯🇵 日本[2.5x]-高端2",
+        "🇯🇵 日本[2.5x]-高端3",
+        "🇯🇵 日本[1.5x]-高端B",
+        "🇯🇵 日本[2.5x]-高端D",
+        "🇯🇵 日本[1.5x]-高端E",
+        "🇸🇬 新加坡[2.5x]-移动高端",
+        "🇸🇬 新加坡[2.5x]-高端1",
+        "🇸🇬 新加坡[2.5x]-高端2",
+        "🇺🇸 美国[2x]-4837高端1",
+        "🇺🇸 美国[2x]-4837高端2",
+        "🇺🇸 美国[2x]-4837高端3",
+        "🇺🇸 美国[2x]-4837高端4",
+        "🇺🇸 美国[2x]-4837高端5",
+        "🇩🇪 德国[1.4x]-高端1",
+        "🇩🇪 德国[1.4x]-高端2",
+        "🇨🇦 加拿大[1.5x]-冷门",
+        "🇦🇺 澳大利亚[8x]-中转",
+        "🇻🇳 越南[8x]-中转",
+        "🇹🇭 泰国[8x]-中转",
+        "🇲🇾 马来西亚[10x]-中转",
+        "🇮🇩 印尼[8x]",
+        "🇺🇦 乌克兰[7x]-家宽",
+        "🇰🇿 哈萨克斯坦[7x]-家宽",
+        "🇧🇩 孟加拉国[12x]-中转",
+        "🇭🇰 香港[1.5x]-优化1",
+        "🇭🇰 香港[1.5x]-优化2",
+        "🇭🇰 香港[1.5x]-优化3",
+        "🇫🇷 法国[1x]",
+        "🇺🇸 美国[1.2x]-优化A1",
+        "🇺🇸 美国[1.3x]-优化D",
+        "🇺🇸 美国[1.3x]-优化B1",
+        "🇺🇸 美国[1.3x]-优化C1",
+        "🇺🇸 美国[1x]-1",
+        "🇺🇸 美国[1x]-2",
+        "🇳🇱 荷兰[0.95x]-1",
+        "🇩🇪 德国[1x]-A1",
+        "🇬🇧 英国[0.9x]-1",
+        "🇹🇷 土耳其[0.9x]-1",
+        "🇷🇺 俄罗斯[1x]-BT",
+        "🇮🇳 印度[1.3x]-联移优化",
+        "🇯🇵 日本[1.6x]-优化1",
+        "🇯🇵 日本[1.6x]-优化2",
+        "🇸🇬 新加坡[2.5x]-2",
+        "🇭🇰 香港[1.5x]-联移优化",
+        "🇭🇰 香港[1x]-移动A1",
+        "🇹🇼 台湾[1.9x]-2",
+        "若节点故障先更新订阅并设置订阅自动更新",
+        "官网域名: login1.cb2077.com（墙内访问）",
+        "socks-out"
+      ]
+    },
+    {
+      "type": "urltest",
+      "tag": "🎈 自动选择",
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "3m",
+      "tolerance": 150,
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🇹🇼 台湾[2.4x]-豪华家宽A1",
+        "🇹🇼 台湾[2.4x]-豪华家宽A2",
+        "🇹🇼 台湾[2.4x]-豪华家宽A3",
+        "🇹🇼 台湾[2.3x]-豪华家宽B1",
+        "🇹🇼 台湾[2.3x]-豪华家宽B2",
+        "🇭🇰 香港[2.4x]-电信豪华1",
+        "🇭🇰 香港[2.4x]-电信豪华2",
+        "🇭🇰 香港[3x]-豪华1",
+        "🇭🇰 香港[3x]-移动豪华1",
+        "🇭🇰 香港[15x]-专线A",
+        "🇭🇰 香港[12x]-CMI2",
+        "🇭🇰 香港[12x]-CMI1",
+        "🇭🇰 香港[20x]-专线B",
+        "🇭🇰 香港[18x]-专线C-CN2",
+        "🇯🇵 日本[15x]-联移专线",
+        "🇯🇵 日本[6.5x]-豪华IIJ-1",
+        "🇯🇵 日本[6.5x]-豪华B",
+        "🇯🇵 日本[6.2x]-豪华A",
+        "🇯🇵 日本[6.5x]-豪华IIJ-2",
+        "🇯🇵 日本[6x]-IIJ-B",
+        "🇸🇬 新加坡[6.2x]-豪华",
+        "🇸🇬 新加坡[17x]-电联专线",
+        "🇰🇷 韩国[5x]-电移豪华",
+        "🇰🇷 韩国[7x]-豪华A1",
+        "🇰🇷 韩国[7x]-豪华A2",
+        "🇺🇸 美国[16x]-专线",
+        "🇭🇰 美国[12x]-9929/CMI2-联移豪华",
+        "🇺🇸 美国[12x]-CN2-电信豪华",
+        "🇭🇰 荷兰[20x]-专线-CN2/CMIN2/9929",
+        "🇹🇼 台湾[17x]-电联专线",
+        "🇲🇴 澳门[4x]-移动优化",
+        "🇹🇼 台湾[2.4x]-高端家宽A1",
+        "🇹🇼 台湾[2.4x]-高端家宽A2",
+        "🇹🇼 台湾[2.4x]-高端家宽A3",
+        "🇹🇼 台湾[2.3x]-高端家宽B1",
+        "🇹🇼 台湾[2.3x]-高端家宽B2",
+        "🇹🇼 台湾[2.3x]-高端家宽B3",
+        "🇭🇰 香港[2.4x]-高端A1",
+        "🇭🇰 香港[2.4x]-高端A2",
+        "🇭🇰 香港[2.4x]-高端A3",
+        "🇭🇰 香港[2.8x]-高端B1",
+        "🇭🇰 香港[2.8x]-移动高端",
+        "🇯🇵 日本[2.4x]-移动高端",
+        "🇯🇵 日本[2.5x]-高端1",
+        "🇯🇵 日本[2.5x]-高端2",
+        "🇯🇵 日本[2.5x]-高端3",
+        "🇯🇵 日本[1.5x]-高端B",
+        "🇯🇵 日本[2.5x]-高端D",
+        "🇯🇵 日本[1.5x]-高端E",
+        "🇸🇬 新加坡[2.5x]-移动高端",
+        "🇸🇬 新加坡[2.5x]-高端1",
+        "🇸🇬 新加坡[2.5x]-高端2",
+        "🇺🇸 美国[2x]-4837高端1",
+        "🇺🇸 美国[2x]-4837高端2",
+        "🇺🇸 美国[2x]-4837高端3",
+        "🇺🇸 美国[2x]-4837高端4",
+        "🇺🇸 美国[2x]-4837高端5",
+        "🇩🇪 德国[1.4x]-高端1",
+        "🇩🇪 德国[1.4x]-高端2",
+        "🇨🇦 加拿大[1.5x]-冷门",
+        "🇦🇺 澳大利亚[8x]-中转",
+        "🇻🇳 越南[8x]-中转",
+        "🇹🇭 泰国[8x]-中转",
+        "🇲🇾 马来西亚[10x]-中转",
+        "🇮🇩 印尼[8x]",
+        "🇺🇦 乌克兰[7x]-家宽",
+        "🇰🇿 哈萨克斯坦[7x]-家宽",
+        "🇧🇩 孟加拉国[12x]-中转",
+        "🇭🇰 香港[1.5x]-优化1",
+        "🇭🇰 香港[1.5x]-优化2",
+        "🇭🇰 香港[1.5x]-优化3",
+        "🇫🇷 法国[1x]",
+        "🇺🇸 美国[1.2x]-优化A1",
+        "🇺🇸 美国[1.3x]-优化D",
+        "🇺🇸 美国[1.3x]-优化B1",
+        "🇺🇸 美国[1.3x]-优化C1",
+        "🇺🇸 美国[1x]-1",
+        "🇺🇸 美国[1x]-2",
+        "🇳🇱 荷兰[0.95x]-1",
+        "🇩🇪 德国[1x]-A1",
+        "🇬🇧 英国[0.9x]-1",
+        "🇹🇷 土耳其[0.9x]-1",
+        "🇷🇺 俄罗斯[1x]-BT",
+        "🇮🇳 印度[1.3x]-联移优化",
+        "🇯🇵 日本[1.6x]-优化1",
+        "🇯🇵 日本[1.6x]-优化2",
+        "🇸🇬 新加坡[2.5x]-2",
+        "🇭🇰 香港[1.5x]-联移优化",
+        "🇭🇰 香港[1x]-移动A1",
+        "🇹🇼 台湾[1.9x]-2",
+        "若节点故障先更新订阅并设置订阅自动更新",
+        "官网域名: login1.cb2077.com（墙内访问）"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "🎯 全球直连",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "direct",
+        "block"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "🛑 全球拦截",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "block",
+        "direct"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "🐟 漏网之鱼",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🚀 节点选择",
+        "🎯 全球直连"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "GLOBAL",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🚀 节点选择",
+        "🎈 自动选择",
+        "🎯 全球直连",
+        "🛑 全球拦截",
+        "🐟 漏网之鱼"
+      ]
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    },
+    {
+      "type": "block",
+      "tag": "block"
+    },
+    {
+      "type": "socks",
+      "tag": "socks-out",
+      "server": "pr.oxylabs.io",
+      "server_port": 7777,
+      "username": "customer-eqwe2e_K8ovh-cc-de-city-berlin-sessid-0724442428-sesstime-1440",
+      "password": "EeEe2323++++",
+      "network": "tcp",
+      "udp_over_tcp": false,
+      "detour": "🎈 自动选择"
+    },
+    {
+      "type": "tuic",
+      "tag": "剩余流量：1056.94 GB",
+      "server": "tcsd.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "tcsd.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "距离下次重置剩余：30 天",
+      "server": "tcsd.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "tcsd.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "套餐到期：2026-08-26",
+      "server": "tcsd.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "tcsd.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇹🇼 台湾[2.4x]-豪华家宽A1",
+      "server": "tcsd.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "tcsd.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇹🇼 台湾[2.4x]-豪华家宽A2",
+      "server": "tcsd.731732.xyz",
+      "server_port": 8443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "tcsd.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇹🇼 台湾[2.4x]-豪华家宽A3",
+      "server": "tcsd.731732.xyz",
+      "server_port": 19840,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "tcsd.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇹🇼 台湾[2.3x]-豪华家宽B1",
+      "server": "tcla.426624.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "tcla.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇹🇼 台湾[2.3x]-豪华家宽B2",
+      "server": "tcla.426624.xyz",
+      "server_port": 8443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "tcla.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[2.4x]-电信豪华1",
+      "server": "hko14.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hko14.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[2.4x]-电信豪华2",
+      "server": "hko12.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "hko12.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[3x]-豪华1",
+      "server": "hkr1.629630.xyz",
+      "server_port": 8443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hkr1.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[3x]-移动豪华1",
+      "server": "hkr2.629630.xyz",
+      "server_port": 20003,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "hkr1.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "anytls",
+      "tag": "🇭🇰 香港[15x]-专线A",
+      "server": "hkif.629630.xyz",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "server_port": 443,
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hkif.629630.xyz"
+      }
+    },
+    {
+      "type": "anytls",
+      "tag": "🇭🇰 香港[12x]-CMI2",
+      "server": "hkzc2.629630.xyz",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "server_port": 443,
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hkzc2.629630.xyz"
+      }
+    },
+    {
+      "type": "anytls",
+      "tag": "🇭🇰 香港[12x]-CMI1",
+      "server": "hkyx.629630.xyz",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "server_port": 443,
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hkyx.629630.xyz"
+      }
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[20x]-专线B",
+      "server": "hkrf1.629630.xyz",
+      "server_port": 29840,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hkrf1.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[18x]-专线C-CN2",
+      "server": "vmhk.629630.xyz",
+      "server_port": 8443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "vmhk.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "anytls",
+      "tag": "🇯🇵 日本[15x]-联移专线",
+      "server": "skyj.629630.xyz",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "server_port": 443,
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "skyj.629630.xyz"
+      }
+    },
+    {
+      "type": "tuic",
+      "tag": "🇯🇵 日本[6.5x]-豪华IIJ-1",
+      "server": "jpp5.426624.xyz",
+      "server_port": 29840,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "jpp5.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇯🇵 日本[6.5x]-豪华B",
+      "server": "alijpa.426624.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "alijpa.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇯🇵 日本[6.2x]-豪华A",
+      "server": "jwp1.731732.xyz",
+      "server_port": 29840,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "jwp1.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇯🇵 日本[6.5x]-豪华IIJ-2",
+      "server": "jpi7.426624.xyz",
+      "server_port": 30770,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "jpi7.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇯🇵 日本[6x]-IIJ-B",
+      "server": "yyjp.164165.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "yyjp.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇸🇬 新加坡[6.2x]-豪华",
+      "server": "sg1.164165.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "sg1.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "anytls",
+      "tag": "🇸🇬 新加坡[17x]-电联专线",
+      "server": "hkif.629630.xyz",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "server_port": 50001,
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hkif.629630.xyz"
+      }
+    },
+    {
+      "type": "tuic",
+      "tag": "🇰🇷 韩国[5x]-电移豪华",
+      "server": "hhkr1.164165.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hhkr1.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇰🇷 韩国[7x]-豪华A1",
+      "server": "kr1.629630.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "kr1.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇰🇷 韩国[7x]-豪华A2",
+      "server": "kr2.629630.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "kr2.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇺🇸 美国[16x]-专线",
+      "server": "usdt.629630.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "usdt.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "anytls",
+      "tag": "🇭🇰 美国[12x]-9929/CMI2-联移豪华",
+      "server": "usdm3.629630.xyz",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "server_port": 443,
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "usdm3.629630.xyz"
+      }
+    },
+    {
+      "type": "anytls",
+      "tag": "🇺🇸 美国[12x]-CN2-电信豪华",
+      "server": "usbw3.164165.xyz",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "server_port": 443,
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "usbw3.164165.xyz"
+      }
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 荷兰[20x]-专线-CN2/CMIN2/9929",
+      "server": "du1.164165.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "du1.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "anytls",
+      "tag": "🇹🇼 台湾[17x]-电联专线",
+      "server": "hkif.629630.xyz",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "server_port": 50002,
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hkif.629630.xyz"
+      }
+    },
+    {
+      "type": "tuic",
+      "tag": "🇲🇴 澳门[4x]-移动优化",
+      "server": "mc1.164165.xyz",
+      "server_port": 2053,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "mc1.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇹🇼 台湾[2.4x]-高端家宽A1",
+      "server": "trw.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "trw.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇹🇼 台湾[2.4x]-高端家宽A2",
+      "server": "trw.731732.xyz",
+      "server_port": 19840,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "trw.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇹🇼 台湾[2.4x]-高端家宽A3",
+      "server": "trw.731732.xyz",
+      "server_port": 19841,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "trw.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇹🇼 台湾[2.3x]-高端家宽B1",
+      "server": "tcla.426624.xyz",
+      "server_port": 30770,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "tcla.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇹🇼 台湾[2.3x]-高端家宽B2",
+      "server": "tcla.426624.xyz",
+      "server_port": 40880,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "tcla.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "server": "tcla.426624.xyz",
+      "server_port": 2053,
+      "tag": "🇹🇼 台湾[2.3x]-高端家宽B3",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "server_name": "tcla.426624.xyz"
+      },
+      "up_mbps": 200,
+      "down_mbps": 200,
+      "type": "hysteria2",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "obfs": null
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[2.4x]-高端A1",
+      "server": "hkoaa.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hkoaa.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[2.4x]-高端A2",
+      "server": "hkoaa.731732.xyz",
+      "server_port": 30880,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hkoaa.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[2.4x]-高端A3",
+      "server": "hkoba.731732.xyz",
+      "server_port": 30770,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hkoba.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[2.8x]-高端B1",
+      "server": "hkteaa.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hkteaa.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[2.8x]-移动高端",
+      "server": "hks1.426624.xyz",
+      "server_port": 30770,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hks1.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "server": "jphhba.629630.xyz",
+      "server_port": 8443,
+      "tag": "🇯🇵 日本[2.4x]-移动高端",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "server_name": "jphhba.629630.xyz"
+      },
+      "up_mbps": 120,
+      "down_mbps": 120,
+      "type": "hysteria2",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "obfs": null
+    },
+    {
+      "type": "tuic",
+      "tag": "🇯🇵 日本[2.5x]-高端1",
+      "server": "jpb2.629630.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "jpb2.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇯🇵 日本[2.5x]-高端2",
+      "server": "jpb4.629630.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "jpb4.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇯🇵 日本[2.5x]-高端3",
+      "server": "jpb5.629630.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "jpb5.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇯🇵 日本[1.5x]-高端B",
+      "server": "jpo3.629630.xyz",
+      "server_port": 30770,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "jpo3.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "server": "jp2.426624.xyz",
+      "server_port": 30770,
+      "tag": "🇯🇵 日本[2.5x]-高端D",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "server_name": "jp2.426624.xyz"
+      },
+      "up_mbps": 200,
+      "down_mbps": 200,
+      "type": "hysteria2",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "obfs": null
+    },
+    {
+      "type": "tuic",
+      "tag": "🇯🇵 日本[1.5x]-高端E",
+      "server": "jpo2.629630.xyz",
+      "server_port": 30770,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "jpo2.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇸🇬 新加坡[2.5x]-移动高端",
+      "server": "sgh1.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "sgh1.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇸🇬 新加坡[2.5x]-高端1",
+      "server": "sgoaa.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "sgoaa.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇸🇬 新加坡[2.5x]-高端2",
+      "server": "sgo2.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "sgo2.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇺🇸 美国[2x]-4837高端1",
+      "server": "utsa.164165.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "utsa.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇺🇸 美国[2x]-4837高端2",
+      "server": "utsba.164165.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "utsba.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇺🇸 美国[2x]-4837高端3",
+      "server": "us1.164165.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "us1.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇺🇸 美国[2x]-4837高端4",
+      "server": "us3.164165.xyz",
+      "server_port": 30770,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "us3.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇺🇸 美国[2x]-4837高端5",
+      "server": "us5.731732.xyz",
+      "server_port": 30770,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "us5.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇩🇪 德国[1.4x]-高端1",
+      "server": "deub1.731732.xyz",
+      "server_port": 29841,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "deub1.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇩🇪 德国[1.4x]-高端2",
+      "server": "deub2.731732.xyz",
+      "server_port": 29841,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "deub2.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇨🇦 加拿大[1.5x]-冷门",
+      "server": "caa.164165.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "caa.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇦🇺 澳大利亚[8x]-中转",
+      "server": "auszz.164165.xyz",
+      "server_port": 19843,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "auszz.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇻🇳 越南[8x]-中转",
+      "server": "vet.164165.xyz",
+      "server_port": 19845,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "vet.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇹🇭 泰国[8x]-中转",
+      "server": "th2.164165.xyz",
+      "server_port": 20161,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "th2.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇲🇾 马来西亚[10x]-中转",
+      "server": "malai2.164165.xyz",
+      "server_port": 19844,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "malai2.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇮🇩 印尼[8x]",
+      "server": "indo1.164165.xyz",
+      "server_port": 20030,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "indo1.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "anytls",
+      "tag": "🇺🇦 乌克兰[7x]-家宽",
+      "server": "uqr2.164165.xyz",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "server_port": 20021,
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "uqr2.164165.xyz"
+      }
+    },
+    {
+      "type": "anytls",
+      "tag": "🇰🇿 哈萨克斯坦[7x]-家宽",
+      "server": "haza3.164165.xyz",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "server_port": 20232,
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "uqr2.164165.xyz"
+      }
+    },
+    {
+      "type": "tuic",
+      "tag": "🇧🇩 孟加拉国[12x]-中转",
+      "server": "sgzz.164165.xyz",
+      "server_port": 20770,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "sgzz.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[1.5x]-优化1",
+      "server": "syht.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "syht.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[1.5x]-优化2",
+      "server": "syht.731732.xyz",
+      "server_port": 8443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "syht.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[1.5x]-优化3",
+      "server": "syht.731732.xyz",
+      "server_port": 29840,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "syht.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇫🇷 法国[1x]",
+      "server": "frlya.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "frlya.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇺🇸 美国[1.2x]-优化A1",
+      "server": "usse5.629630.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "usse5.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇺🇸 美国[1.3x]-优化D",
+      "server": "ushca.164165.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "ushca.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇺🇸 美国[1.3x]-优化B1",
+      "server": "sakua.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "sakua.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇺🇸 美国[1.3x]-优化C1",
+      "server": "usbaa.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "usbaa.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇺🇸 美国[1x]-1",
+      "server": "ccsaa.426624.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "ccsaa.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇺🇸 美国[1x]-2",
+      "server": "ccsbb.426624.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "ccsbb.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇳🇱 荷兰[0.95x]-1",
+      "server": "smduaa.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "smduaa.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇩🇪 德国[1x]-A1",
+      "server": "deura.426624.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "deura.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇬🇧 英国[0.9x]-1",
+      "server": "mass1.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "mass1.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇹🇷 土耳其[0.9x]-1",
+      "server": "tkb.164165.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "tkb.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇷🇺 俄罗斯[1x]-BT",
+      "server": "rua.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "rua.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇮🇳 印度[1.3x]-联移优化",
+      "server": "idh.164165.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "idh.164165.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇯🇵 日本[1.6x]-优化1",
+      "server": "jpo3a.629630.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "jpo3a.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇯🇵 日本[1.6x]-优化2",
+      "server": "jpo3a.629630.xyz",
+      "server_port": 30770,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "jpo3a.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇸🇬 新加坡[2.5x]-2",
+      "server": "sgo11.731732.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "sgo11.731732.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[1.5x]-联移优化",
+      "server": "hktlb.629630.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3",
+          "h2"
+        ],
+        "server_name": "hktlb.629630.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "🇭🇰 香港[1x]-移动A1",
+      "server": "hkhyab.426624.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "hkhyab.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "anytls",
+      "tag": "🇹🇼 台湾[1.9x]-2",
+      "server": "t3wf.426624.xyz",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "server_port": 19842,
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "t3wf.426624.xyz"
+      }
+    },
+    {
+      "type": "tuic",
+      "tag": "若节点故障先更新订阅并设置订阅自动更新",
+      "server": "ccg10.426624.xyz",
+      "server_port": 443,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "ccg10.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    },
+    {
+      "type": "tuic",
+      "tag": "官网域名: login1.cb2077.com（墙内访问）",
+      "server": "ccg10.426624.xyz",
+      "server_port": 29840,
+      "congestion_control": "bbr",
+      "udp_relay_mode": "native",
+      "zero_rtt_handshake": true,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "insecure": false,
+        "alpn": [
+          "h3"
+        ],
+        "server_name": "ccg10.426624.xyz"
+      },
+      "uuid": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a",
+      "password": "0dfd07f7-ce9c-4ad6-9214-cc6b763ff67a"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "action": "sniff"
+      },
+      {
+        "action": "hijack-dns",
+        "protocol": "dns"
+      },
+      {
+        "action": "route",
+        "clash_mode": "direct",
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "clash_mode": "global",
+        "outbound": "GLOBAL"
+      },
+      {
+        "action": "route",
+        "network": "icmp",
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "ip_cidr": [
+          "10.0.0.0/24",
+          "192.168.1.0/24"
+        ],
+        "outbound": "wg-home"
+      },
+      {
+        "action": "route",
+        "protocol": "quic",
+        "outbound": "🛑 全球拦截"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "Category-Ads"
+        ],
+        "outbound": "🛑 全球拦截"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoSite-Private"
+        ],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoSite-CN"
+        ],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoIP-Private"
+        ],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoIP-CN"
+        ],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoLocation-!CN"
+        ],
+        "outbound": "🚀 节点选择"
+      }
+    ],
+    "rule_set": [
+      {
+        "tag": "Category-Ads",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoIP-Private",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoSite-Private",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoIP-CN",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoSite-CN",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoLocation-!CN",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      }
+    ],
+    "auto_detect_interface": true,
+    "find_process": true,
+    "final": "🐟 漏网之鱼",
+    "default_domain_resolver": {
+      "server": "Local-DNS"
+    }
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "Fake-IP",
+        "type": "fakeip",
+        "inet4_range": "198.18.0.0/15",
+        "inet6_range": "fc00::/18"
+      },
+      {
+        "tag": "Local-DNS",
+        "type": "https",
+        "domain_resolver": "Local-DNS-Resolver",
+        "server_port": 443,
+        "server": "223.5.5.5",
+        "path": "/dns-query"
+      },
+      {
+        "tag": "Local-DNS-Resolver",
+        "type": "udp",
+        "server_port": 53,
+        "server": "223.5.5.5"
+      },
+      {
+        "tag": "Remote-DNS",
+        "type": "https",
+        "detour": "🚀 节点选择",
+        "domain_resolver": "Remote-DNS-Resolver",
+        "server_port": 443,
+        "server": "8.8.8.8",
+        "path": "/dns-query"
+      },
+      {
+        "tag": "Remote-DNS-Resolver",
+        "type": "udp",
+        "detour": "🚀 节点选择",
+        "server_port": 53,
+        "server": "8.8.8.8"
+      }
+    ],
+    "rules": [
+      {
+        "action": "route",
+        "clash_mode": "direct",
+        "server": "Local-DNS"
+      },
+      {
+        "action": "route",
+        "clash_mode": "global",
+        "server": "Remote-DNS"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoSite-CN"
+        ],
+        "server": "Local-DNS"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoLocation-!CN"
+        ],
+        "server": "Remote-DNS"
+      }
+    ],
+    "disable_cache": false,
+    "disable_expire": false,
+    "independent_cache": false,
+    "final": "Remote-DNS"
+  }
+}
