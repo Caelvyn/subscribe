@@ -129,6 +129,16 @@
       "detour": "🎈 自动选择"
     }
   ],
+  "http_clients": [
+    {
+      "tag": "default",
+      "detour": "🚀 节点选择"
+    },
+    {
+      "tag": "direct",
+      "detour": "🎯 全球直连"
+    }
+  ],
   "route": {
     "rules": [
       {
@@ -200,42 +210,42 @@
         "type": "remote",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
         "format": "binary",
-        "download_detour": "🎯 全球直连"
+        "http_client": "direct"
       },
       {
         "tag": "GeoIP-Private",
         "type": "remote",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs",
         "format": "binary",
-        "download_detour": "🎯 全球直连"
+        "http_client": "direct"
       },
       {
         "tag": "GeoSite-Private",
         "type": "remote",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs",
         "format": "binary",
-        "download_detour": "🎯 全球直连"
+        "http_client": "direct"
       },
       {
         "tag": "GeoIP-CN",
         "type": "remote",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
         "format": "binary",
-        "download_detour": "🎯 全球直连"
+        "http_client": "direct"
       },
       {
         "tag": "GeoSite-CN",
         "type": "remote",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
         "format": "binary",
-        "download_detour": "🎯 全球直连"
+        "http_client": "direct"
       },
       {
         "tag": "GeoLocation-!CN",
         "type": "remote",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs",
         "format": "binary",
-        "download_detour": "🎯 全球直连"
+        "http_client": "direct"
       }
     ],
     "auto_detect_interface": true,
