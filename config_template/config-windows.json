@@ -56,7 +56,13 @@
       "type": "selector",
       "tag": "🚀 节点选择",
       "interrupt_exist_connections": true,
-      "outbounds": ["🎈 自动选择", "{all}","socks-out"]
+      "outbounds": ["🎈 自动选择", "{all}","socks-out"],
+      "filter": [
+        {
+          "action": "exclude",
+          "keywords": ["剩余|到期|距离|过滤|socks|天|流量|到期"]
+        }
+      ]
     },
     {
       "type": "urltest",
@@ -69,7 +75,7 @@
       "filter": [
         {
           "action": "exclude",
-          "keywords": ["剩余|到期|距离|过滤|socks"]
+          "keywords": ["剩余|到期|距离|过滤|socks|天|流量|到期"]
         }
       ]
     },
