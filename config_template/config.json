@@ -75,7 +75,7 @@
       "filter": [
         {
           "action": "exclude",
-          "keywords": ["剩余|到期|距离|过滤"]
+          "keywords": ["剩余|到期|距离|过滤|socks"]
         }
       ]
     },
