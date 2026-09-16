@@ -33,8 +33,9 @@ def parse(data):
         'uuid': _netloc[0].split(':', 1)[-1],
         'packet_encoding': netquery.get('packetEncoding', 'xudp')
     }
-    if netquery.get('flow') != 'None':
-        node['flow'] = 'xtls-rprx-vision'
+    flow = netquery.get('flow')
+    if flow and flow.lower() != 'none':
+        node['flow'] = flow
     if netquery.get('security', '') not in ['None', 'none', ''] or netquery.get('tls') == '1':
         node['tls'] = {
             'enabled': True,
