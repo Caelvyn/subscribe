@@ -10,7 +10,7 @@ def parse(data):
     )
     if server_info.path:
       server_info = server_info._replace(netloc=server_info.netloc + server_info.path, path="")
-    ports_match = re.search(r',(\d+-\d+)', server_info.netloc)
+    ports_match = re.search(r',(\d+-\d+)', server_info.netloc) or re.search(r':(\d+-\d+)', server_info.netloc)
     node = {
         'tag': unquote(server_info.fragment) or tool.genName()+'_hysteria2',
         'type': 'hysteria2',
