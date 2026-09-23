@@ -44,6 +44,16 @@
         "action": "reject"
       },
       {
+        "domain_suffix": [
+          "google.com",
+          "googleapis.com",
+          "gstatic.com",
+          "googleusercontent.com"
+        ],
+        "action": "route",
+        "server": "dns-global"
+      },
+      {
         "rule_set": "geosite-cn",
         "action": "route",
         "server": "dns-cn"
@@ -122,6 +132,16 @@
       {
         "rule_set": "ads",
         "action": "reject"
+      },
+      {
+        "domain_suffix": [
+          "google.com",
+          "googleapis.com",
+          "gstatic.com",
+          "googleusercontent.com"
+        ],
+        "action": "route",
+        "outbound": "PROXY"
       },
       {
         "rule_set": "geosite-cn",
