@@ -37,17 +37,24 @@ function convertA(proxy) {
   return outbound;
 }
 
-function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118) {
-  const sourceA = YAML.parse(aText);
-  const sourceB = JSON.parse(bText);
-  if (!Array.isArray(sourceA?.proxies) || !Array.isArray(sourceB?.outbounds)) {
-    throw new Error('Subscription format changed');
+function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, source = 'AB') {
+  if (!['A', 'B', 'AB'].includes(source)) throw new Error('Unknown source');
+  let aNodes = [];
+  let bNodes = [];
+  if (source !== 'B') {
+    const sourceA = YAML.parse(aText);
+    if (!Array.isArray(sourceA?.proxies)) throw new Error('A subscription format changed');
+    aNodes = sourceA.proxies.map(convertA);
   }
-  const aNodes = sourceA.proxies.map(convertA);
-  const bNodes = sourceB.outbounds
-    .filter(outbound => ['anytls', 'hysteria2', 'tuic'].includes(outbound.type))
-    .map(outbound => ({ ...outbound, tag: uniqueTag('B', outbound.tag, outbound) }));
-  if (aNodes.length < minimumA || bNodes.length < minimumB) {
+  if (source !== 'A') {
+    const sourceB = JSON.parse(bText);
+    if (!Array.isArray(sourceB?.outbounds)) throw new Error('B subscription format changed');
+    bNodes = sourceB.outbounds
+      .filter(outbound => ['anytls', 'hysteria2', 'tuic'].includes(outbound.type))
+      .map(outbound => ({ ...outbound, tag: uniqueTag('B', outbound.tag, outbound) }));
+  }
+  if ((source !== 'B' && aNodes.length < minimumA) ||
+      (source !== 'A' && bNodes.length < minimumB)) {
     throw new Error('Node count dropped');
   }
   const nodeTags = [...aNodes, ...bNodes].map(outbound => outbound.tag);

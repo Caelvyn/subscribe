@@ -29,20 +29,27 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET');
     return res.end('{"error":"Method not allowed"}');
   }
-  const key = new URL(req.url, 'https://local.invalid').searchParams.get('key');
+  const params = new URL(req.url, 'https://local.invalid').searchParams;
+  const key = params.get('key');
   if (!tokenMatches(key, process.env.MOMO_FEED_TOKEN)) {
     res.statusCode = 403;
     return res.end('{"error":"Forbidden"}');
   }
+  const source = (params.get('source') || 'AB').toUpperCase();
+  if (!['A', 'B', 'AB'].includes(source)) {
+    res.statusCode = 400;
+    return res.end('{"error":"Unknown source"}');
+  }
   const { MOMO_SOURCE_A, MOMO_SOURCE_B, MOMO_API_SECRET } = process.env;
-  if (!MOMO_SOURCE_A || !MOMO_SOURCE_B || !MOMO_API_SECRET) {
+  if ((source !== 'B' && !MOMO_SOURCE_A) ||
+      (source !== 'A' && !MOMO_SOURCE_B) || !MOMO_API_SECRET) {
     res.statusCode = 503;
     return res.end('{"error":"Feed is not configured"}');
   }
   try {
     const [aText, bText] = await Promise.all([
-      fetchSubscription(MOMO_SOURCE_A, 'Clash.Meta'),
-      fetchSubscription(MOMO_SOURCE_B, 'sing-box'),
+      source === 'B' ? '' : fetchSubscription(MOMO_SOURCE_A, 'Clash.Meta'),
+      source === 'A' ? '' : fetchSubscription(MOMO_SOURCE_B, 'sing-box'),
     ]);
     const profile = buildProfile(
       aText,
@@ -50,6 +57,7 @@ export default async function handler(req, res) {
       MOMO_API_SECRET,
       Number(process.env.MOMO_MIN_A || 61),
       Number(process.env.MOMO_MIN_B || 118),
+      source,
     );
     res.statusCode = 200;
     return res.end(JSON.stringify(profile));
