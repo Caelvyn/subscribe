@@ -1,0 +1,172 @@
+{
+  "log": {
+    "level": "warn",
+    "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      {
+        "type": "udp",
+        "tag": "dns-local",
+        "server": "127.0.0.1"
+      },
+      {
+        "type": "udp",
+        "tag": "dns-cn",
+        "server": "223.5.5.5"
+      },
+      {
+        "type": "https",
+        "tag": "dns-global",
+        "server": "1.1.1.1",
+        "detour": "PROXY"
+      }
+    ],
+    "rules": [
+      {
+        "domain_suffix": [
+          "lan",
+          "local",
+          "home.arpa"
+        ],
+        "action": "route",
+        "server": "dns-local"
+      },
+      {
+        "domain_suffix": [
+          "adspower.com"
+        ],
+        "action": "route",
+        "server": "dns-global"
+      },
+      {
+        "rule_set": "ads",
+        "action": "reject"
+      },
+      {
+        "rule_set": "geosite-cn",
+        "action": "route",
+        "server": "dns-cn"
+      }
+    ],
+    "final": "dns-global",
+    "strategy": "prefer_ipv4"
+  },
+  "inbounds": [
+    {
+      "type": "direct",
+      "tag": "dns-in",
+      "listen": "::",
+      "listen_port": 10553
+    },
+    {
+      "type": "redirect",
+      "tag": "redirect-in",
+      "listen": "::",
+      "listen_port": 10554
+    },
+    {
+      "type": "tproxy",
+      "tag": "tproxy-in",
+      "listen": "::",
+      "listen_port": 10555
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "selector",
+      "tag": "PROXY",
+      "outbounds": []
+    },
+    {
+      "type": "direct",
+      "tag": "DIRECT"
+    }
+  ],
+  "route": {
+    "auto_detect_interface": true,
+    "default_domain_resolver": "dns-cn",
+    "rules": [
+      {
+        "action": "sniff"
+      },
+      {
+        "inbound": "dns-in",
+        "action": "hijack-dns"
+      },
+      {
+        "protocol": "dns",
+        "action": "hijack-dns"
+      },
+      {
+        "ip_is_private": true,
+        "action": "route",
+        "outbound": "DIRECT"
+      },
+      {
+        "domain_suffix": [
+          "lan",
+          "local",
+          "home.arpa"
+        ],
+        "action": "route",
+        "outbound": "DIRECT"
+      },
+      {
+        "domain_suffix": [
+          "adspower.com"
+        ],
+        "action": "route",
+        "outbound": "PROXY"
+      },
+      {
+        "rule_set": "ads",
+        "action": "reject"
+      },
+      {
+        "rule_set": "geosite-cn",
+        "action": "route",
+        "outbound": "DIRECT"
+      },
+      {
+        "rule_set": "geoip-cn",
+        "action": "route",
+        "outbound": "DIRECT"
+      }
+    ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "ads",
+        "format": "binary",
+        "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
+        "download_detour": "DIRECT"
+      },
+      {
+        "type": "remote",
+        "tag": "geosite-cn",
+        "format": "binary",
+        "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
+        "download_detour": "DIRECT"
+      },
+      {
+        "type": "remote",
+        "tag": "geoip-cn",
+        "format": "binary",
+        "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
+        "download_detour": "DIRECT"
+      }
+    ],
+    "final": "PROXY"
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true,
+      "path": "/etc/momo/cache.db"
+    },
+    "clash_api": {
+      "external_controller": "0.0.0.0:9090",
+      "secret": ""
+    }
+  }
+}

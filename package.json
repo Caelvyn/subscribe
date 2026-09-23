@@ -1,0 +1,9 @@
+{
+  "name": "subscribe-with-momo-feed",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "yaml": "2.9.1"
+  }
+}
