@@ -106,7 +106,39 @@ function buildA(clashText, wanInterface) {
   return { nodes, dnsServers };
 }
 
-function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, source = 'AB', wanInterface = 'pppoe-wan') {
+function addPhoneMode(profile, phone) {
+  if (!phone || Object.values(phone).every(value => value === undefined || value === '')) return;
+  const { mac, server, port, username, password } = phone;
+  if (![mac, server, port, username, password].every(value => value !== undefined && value !== '')) {
+    throw new Error('Incomplete phone residential proxy settings');
+  }
+  if (!/^([0-9a-f]{2}:){5}[0-9a-f]{2}$/i.test(mac)) throw new Error('Invalid phone MAC');
+  if (!Number.isInteger(Number(port)) || Number(port) < 1 || Number(port) > 65535) {
+    throw new Error('Invalid residential proxy port');
+  }
+  const phoneMatch = { source_mac_address: [mac.toLowerCase()] };
+  profile.outbounds.push({
+    type: 'socks', tag: 'PHONE-RESIDENTIAL', server, server_port: Number(port),
+    version: '5', username, password, network: 'tcp', domain_resolver: 'dns-cn',
+  });
+  profile.dns.servers.push({
+    type: 'https', tag: 'dns-phone-residential', server: '1.1.1.1',
+    detour: 'PHONE-RESIDENTIAL',
+  });
+  profile.dns.rules.splice(1, 0,
+    { ...phoneMatch, clash_mode: 'Global', action: 'route', server: 'dns-phone-residential', strategy: 'prefer_ipv4' },
+    { ...phoneMatch, clash_mode: 'Direct', action: 'route', server: 'dns-cn' },
+  );
+  // The DNS hijack and private-LAN rules stay first. Public traffic is scoped by
+  // this Wi-Fi MAC, so changing Clash mode does not change other LAN clients.
+  profile.route.rules.splice(5, 0,
+    { ...phoneMatch, clash_mode: 'Global', network: 'udp', action: 'reject' },
+    { ...phoneMatch, clash_mode: 'Global', action: 'route', outbound: 'PHONE-RESIDENTIAL' },
+    { ...phoneMatch, clash_mode: 'Direct', action: 'route', outbound: 'DIRECT' },
+  );
+}
+
+function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, source = 'AB', wanInterface = 'pppoe-wan', phone) {
   if (!['A', 'B', 'AB'].includes(source)) throw new Error('Unknown source');
   let aNodes = [];
   let aDnsServers = [];
@@ -137,6 +169,7 @@ function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, so
   profile.outbounds[0].default = nodeTags[0];
   profile.outbounds.push(...aNodes, ...bNodes);
   profile.experimental.clash_api.secret = need(apiSecret, 'API secret');
+  addPhoneMode(profile, phone);
   return profile;
 }
 

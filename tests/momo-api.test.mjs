@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import handler from '../api/momo.js';
+import profileBuilder from '../build-profile.cjs';
 
 const originalFetch = globalThis.fetch;
 const originalEnv = Object.fromEntries(
@@ -74,4 +75,34 @@ test('Momo feed requests only the selected source with its required UA', async (
       else process.env[name] = value;
     }
   }
+});
+
+test('phone modes scope residential and direct routing to the 2.4G MAC', () => {
+  const profile = profileBuilder.buildProfile('', JSON.stringify({ outbounds: [
+    { type: 'anytls', tag: 'B1', server: 'b.example.test', server_port: 443, password: 'test' },
+  ] }), 'api-secret', 0, 1, 'B', 'pppoe-wan', {
+    mac: '02:00:00:00:00:24', server: 'proxy.example.test', port: '7777',
+    username: 'test-user', password: 'test-password',
+  });
+  assert.deepEqual(profile.outbounds.find(outbound => outbound.tag === 'PHONE-RESIDENTIAL'), {
+    type: 'socks', tag: 'PHONE-RESIDENTIAL', server: 'proxy.example.test',
+    server_port: 7777, version: '5', username: 'test-user', password: 'test-password',
+    network: 'tcp', domain_resolver: 'dns-cn',
+  });
+  const phoneRules = profile.route.rules.filter(rule => rule.source_mac_address);
+  assert.deepEqual(phoneRules.map(rule => [rule.clash_mode, rule.network, rule.action, rule.outbound]), [
+    ['Global', 'udp', 'reject', undefined],
+    ['Global', undefined, 'route', 'PHONE-RESIDENTIAL'],
+    ['Direct', undefined, 'route', 'DIRECT'],
+  ]);
+  assert.ok(phoneRules.every(rule => rule.source_mac_address[0] === '02:00:00:00:00:24'));
+  assert.ok(profile.route.rules.indexOf(phoneRules[0]) <
+    profile.route.rules.findIndex(rule => rule.rule_set === 'ads'));
+  const phoneDnsRules = profile.dns.rules.filter(rule => rule.source_mac_address);
+  assert.deepEqual(phoneDnsRules.map(rule => [rule.clash_mode, rule.server]), [
+    ['Global', 'dns-phone-residential'], ['Direct', 'dns-cn'],
+  ]);
+  assert.equal(phoneDnsRules[0].strategy, 'prefer_ipv4');
+  assert.equal(profile.dns.servers.find(server => server.tag === 'dns-phone-residential').detour,
+    'PHONE-RESIDENTIAL');
 });
