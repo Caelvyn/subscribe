@@ -61,6 +61,7 @@ export default async function handler(req, res) {
       process.env.MOMO_WAN_INTERFACE || 'pppoe-wan',
       process.env.MOMO_PHONE_MODE_ENABLED === '1' ? {
         mac: process.env.MOMO_PHONE_24G_MAC,
+        ip: process.env.MOMO_PHONE_24G_IP,
         server: process.env.MOMO_RESIDENTIAL_SERVER,
         port: process.env.MOMO_RESIDENTIAL_PORT,
         username: process.env.MOMO_RESIDENTIAL_USERNAME,

@@ -108,15 +108,19 @@ function buildA(clashText, wanInterface) {
 
 function addPhoneMode(profile, phone) {
   if (!phone || Object.values(phone).every(value => value === undefined || value === '')) return;
-  const { mac, server, port, username, password } = phone;
-  if (![mac, server, port, username, password].every(value => value !== undefined && value !== '')) {
+  const { mac, ip, server, port, username, password } = phone;
+  if (![mac, ip, server, port, username, password].every(value => value !== undefined && value !== '')) {
     throw new Error('Incomplete phone residential proxy settings');
   }
   if (!/^([0-9a-f]{2}:){5}[0-9a-f]{2}$/i.test(mac)) throw new Error('Invalid phone MAC');
+  if (net.isIP(ip) !== 4) throw new Error('Invalid phone IPv4 address');
   if (!Number.isInteger(Number(port)) || Number(port) < 1 || Number(port) > 65535) {
     throw new Error('Invalid residential proxy port');
   }
-  const phoneMatch = { source_mac_address: [mac.toLowerCase()] };
+  const phoneMatches = [
+    { source_mac_address: [mac.toLowerCase()] },
+    { source_ip_cidr: [`${ip}/32`] },
+  ];
   profile.outbounds.push({
     type: 'socks', tag: 'PHONE-RESIDENTIAL', server, server_port: Number(port),
     version: '5', username, password, network: 'tcp', domain_resolver: 'dns-cn',
@@ -126,15 +130,15 @@ function addPhoneMode(profile, phone) {
     detour: 'PHONE-RESIDENTIAL',
   });
   profile.dns.rules.splice(1, 0,
-    { ...phoneMatch, clash_mode: 'Global', action: 'route', server: 'dns-phone-residential', strategy: 'prefer_ipv4' },
-    { ...phoneMatch, clash_mode: 'Direct', action: 'route', server: 'dns-cn' },
+    ...phoneMatches.map(match => ({ ...match, clash_mode: 'Global', action: 'route', server: 'dns-phone-residential', strategy: 'prefer_ipv4' })),
+    ...phoneMatches.map(match => ({ ...match, clash_mode: 'Direct', action: 'route', server: 'dns-cn' })),
   );
   // The DNS hijack and private-LAN rules stay first. Public traffic is scoped by
   // this Wi-Fi MAC, so changing Clash mode does not change other LAN clients.
   profile.route.rules.splice(5, 0,
-    { ...phoneMatch, clash_mode: 'Global', network: 'udp', action: 'reject' },
-    { ...phoneMatch, clash_mode: 'Global', action: 'route', outbound: 'PHONE-RESIDENTIAL' },
-    { ...phoneMatch, clash_mode: 'Direct', action: 'route', outbound: 'DIRECT' },
+    ...phoneMatches.map(match => ({ ...match, clash_mode: 'Global', network: 'udp', action: 'reject' })),
+    ...phoneMatches.map(match => ({ ...match, clash_mode: 'Global', action: 'route', outbound: 'PHONE-RESIDENTIAL' })),
+    ...phoneMatches.map(match => ({ ...match, clash_mode: 'Direct', action: 'route', outbound: 'DIRECT' })),
   );
 }
 

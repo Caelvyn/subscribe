@@ -36,12 +36,12 @@ A 的完整节点来自 `Clash.Meta` UA。生成器从同一份订阅的 `dns.na
 
 此前路由器通过现有自定义域名取得过合并配置，并通过路由器 sing-box 检查。拆分版仍需在部署后从路由器分别下载和验证。
 
-## 一加 6T 的 2.4G 模式草案（尚未部署）
+## 一加 6T 的 2.4G 模式草案（尚未启用）
 
-当前路由器是 sing-box 1.12.25，软件源也只提供此版本。按来源 MAC 匹配 IPv4/IPv6 需要 sing-box 1.14；本机使用官方 1.14.1 检查过本草案的配置语法，但尚未在路由器上升级或验证实际流量。
+路由器已安装官方 sing-box 1.14.1，Momo 重启后运行正常，PVE VM 101 已创建受保护的升级前完整备份。手机 2.4G 固定为 `192.168.1.231`，路由器能从 IPv4、IPv6 邻居表识别其设备 MAC。住宅模式尚未启用，也尚未验证实际住宅出口。
 
-默认 `MOMO_PHONE_MODE_ENABLED=0`；即使提前填写代理信息，也继续返回原配置。升级核心并验证防火墙后改为 `1`，A、B 两份配置才会加入一加 6T 的独立规则。此时须完整填写：`MOMO_PHONE_24G_MAC`、`MOMO_RESIDENTIAL_SERVER`、`MOMO_RESIDENTIAL_PORT`、`MOMO_RESIDENTIAL_USERNAME`、`MOMO_RESIDENTIAL_PASSWORD`。缺任何一项时接口拒绝生成新配置。住宅代理账号密码只应放在私有环境变量，不能提交到 Git。**此实现会把住宅代理账号密码放进 Vercel 返回给路由器的完整配置；启用前需要明确接受该存储与传输方式。**
+默认 `MOMO_PHONE_MODE_ENABLED=0`；即使提前填写代理信息，也继续返回原配置。验证防火墙后改为 `1`，A、B 两份配置才会加入一加 6T 的独立规则。此时须完整填写：`MOMO_PHONE_24G_MAC`、`MOMO_PHONE_24G_IP=192.168.1.231`、`MOMO_RESIDENTIAL_SERVER`、`MOMO_RESIDENTIAL_PORT`、`MOMO_RESIDENTIAL_USERNAME`、`MOMO_RESIDENTIAL_PASSWORD`。缺任何一项时接口拒绝生成新配置。IPv4 同时使用设备 MAC 和固定地址作为识别条件，IPv6 使用设备 MAC。住宅代理账号密码只应放在私有环境变量，不能提交到 Git。**此实现会把住宅代理账号密码放进 Vercel 返回给路由器的完整配置；启用前需要明确接受该存储与传输方式。**
 
 在 Zashboard 使用顶部模式切换：`Rule` 为原分流、`Global` 为住宅代理、`Direct` 为直连。只有指定的 2.4G MAC 使用这三个模式；5G MAC 和其他设备继续执行原分流。住宅模式下普通 UDP 被拒绝，住宅 DNS 走住宅 SOCKS5 出口，IPv6 TCP 也尝试从住宅出口发送；若该产品不支持 IPv6 目标，则连接失败而不会回退到普通节点。`Direct` 只表示手机 2.4G 的流量直连，不能作为银行 App 的防泄漏模式。
 
-启用前还须在路由器防火墙增加仅针对 2.4G MAC 的 LAN→WAN IPv4/IPv6 转发拒绝规则，防止 Momo 停止时手机从路由器直接出网；不能误伤 5G MAC。先核对 Momo 捕获规则、备份旧核心与配置，再升级官方 x86_64 包、应用新订阅，最后实测三种模式的 IPv4/IPv6/DNS 出口及断线阻断。验证完成前不要把住宅模式当作银行 App 的严格防泄漏方案。
+路由器防火墙已增加仅针对 2.4G 设备 MAC 的两条拒绝规则：未被 Momo 接管的 LAN→WAN IPv4/IPv6 转发、未被 Momo 劫持的到路由器 53 端口的 DNS。原 `/etc/config/firewall` 已备份到 `/etc/config/firewall.pre-phone-20260924`，`fw4` 语法检查与加载成功。Momo 当前仍工作，但尚需实测手机 2.4G 原分流、三种模式的 IPv4/IPv6/DNS 出口及断线阻断。验证完成前不要把住宅模式当作银行 App 的严格防泄漏方案。

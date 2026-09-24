@@ -6,7 +6,7 @@ import profileBuilder from '../build-profile.cjs';
 const originalFetch = globalThis.fetch;
 const originalEnv = Object.fromEntries(
   ['MOMO_SOURCE_A', 'MOMO_SOURCE_B', 'MOMO_API_SECRET', 'MOMO_FEED_TOKEN', 'MOMO_MIN_A', 'MOMO_MIN_B', 'MOMO_WAN_INTERFACE',
-    'MOMO_PHONE_MODE_ENABLED', 'MOMO_PHONE_24G_MAC', 'MOMO_RESIDENTIAL_SERVER', 'MOMO_RESIDENTIAL_PORT',
+    'MOMO_PHONE_MODE_ENABLED', 'MOMO_PHONE_24G_MAC', 'MOMO_PHONE_24G_IP', 'MOMO_RESIDENTIAL_SERVER', 'MOMO_RESIDENTIAL_PORT',
     'MOMO_RESIDENTIAL_USERNAME', 'MOMO_RESIDENTIAL_PASSWORD']
     .map(name => [name, process.env[name]]),
 );
@@ -22,6 +22,7 @@ test('Momo feed requests only the selected source with its required UA', async (
     MOMO_WAN_INTERFACE: 'pppoe-wan',
     MOMO_PHONE_MODE_ENABLED: '0',
     MOMO_PHONE_24G_MAC: '02:00:00:00:00:24',
+    MOMO_PHONE_24G_IP: '192.168.1.231',
     MOMO_RESIDENTIAL_SERVER: 'proxy.example.test',
     MOMO_RESIDENTIAL_PORT: '7777',
     MOMO_RESIDENTIAL_USERNAME: 'test-user',
@@ -95,7 +96,7 @@ test('phone modes scope residential and direct routing to the 2.4G MAC', () => {
   const profile = profileBuilder.buildProfile('', JSON.stringify({ outbounds: [
     { type: 'anytls', tag: 'B1', server: 'b.example.test', server_port: 443, password: 'test' },
   ] }), 'api-secret', 0, 1, 'B', 'pppoe-wan', {
-    mac: '02:00:00:00:00:24', server: 'proxy.example.test', port: '7777',
+    mac: '02:00:00:00:00:24', ip: '192.168.1.231', server: 'proxy.example.test', port: '7777',
     username: 'test-user', password: 'test-password',
   });
   assert.deepEqual(profile.outbounds.find(outbound => outbound.tag === 'PHONE-RESIDENTIAL'), {
@@ -110,6 +111,12 @@ test('phone modes scope residential and direct routing to the 2.4G MAC', () => {
     ['Direct', undefined, 'route', 'DIRECT'],
   ]);
   assert.ok(phoneRules.every(rule => rule.source_mac_address[0] === '02:00:00:00:00:24'));
+  const phoneIpRules = profile.route.rules.filter(rule => rule.source_ip_cidr?.includes('192.168.1.231/32'));
+  assert.deepEqual(phoneIpRules.map(rule => [rule.clash_mode, rule.network, rule.action, rule.outbound]), [
+    ['Global', 'udp', 'reject', undefined],
+    ['Global', undefined, 'route', 'PHONE-RESIDENTIAL'],
+    ['Direct', undefined, 'route', 'DIRECT'],
+  ]);
   assert.ok(profile.route.rules.indexOf(phoneRules[0]) <
     profile.route.rules.findIndex(rule => rule.rule_set === 'ads'));
   const phoneDnsRules = profile.dns.rules.filter(rule => rule.source_mac_address);
@@ -117,6 +124,10 @@ test('phone modes scope residential and direct routing to the 2.4G MAC', () => {
     ['Global', 'dns-phone-residential'], ['Direct', 'dns-cn'],
   ]);
   assert.equal(phoneDnsRules[0].strategy, 'prefer_ipv4');
+  assert.deepEqual(profile.dns.rules.filter(rule => rule.source_ip_cidr?.includes('192.168.1.231/32'))
+    .map(rule => [rule.clash_mode, rule.server]), [
+      ['Global', 'dns-phone-residential'], ['Direct', 'dns-cn'],
+    ]);
   assert.equal(profile.dns.servers.find(server => server.tag === 'dns-phone-residential').detour,
     'PHONE-RESIDENTIAL');
 });
