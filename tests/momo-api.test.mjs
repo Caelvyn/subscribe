@@ -5,7 +5,9 @@ import profileBuilder from '../build-profile.cjs';
 
 const originalFetch = globalThis.fetch;
 const originalEnv = Object.fromEntries(
-  ['MOMO_SOURCE_A', 'MOMO_SOURCE_B', 'MOMO_API_SECRET', 'MOMO_FEED_TOKEN', 'MOMO_MIN_A', 'MOMO_MIN_B', 'MOMO_WAN_INTERFACE']
+  ['MOMO_SOURCE_A', 'MOMO_SOURCE_B', 'MOMO_API_SECRET', 'MOMO_FEED_TOKEN', 'MOMO_MIN_A', 'MOMO_MIN_B', 'MOMO_WAN_INTERFACE',
+    'MOMO_PHONE_MODE_ENABLED', 'MOMO_PHONE_24G_MAC', 'MOMO_RESIDENTIAL_SERVER', 'MOMO_RESIDENTIAL_PORT',
+    'MOMO_RESIDENTIAL_USERNAME', 'MOMO_RESIDENTIAL_PASSWORD']
     .map(name => [name, process.env[name]]),
 );
 
@@ -18,6 +20,12 @@ test('Momo feed requests only the selected source with its required UA', async (
     MOMO_MIN_A: '2',
     MOMO_MIN_B: '1',
     MOMO_WAN_INTERFACE: 'pppoe-wan',
+    MOMO_PHONE_MODE_ENABLED: '0',
+    MOMO_PHONE_24G_MAC: '02:00:00:00:00:24',
+    MOMO_RESIDENTIAL_SERVER: 'proxy.example.test',
+    MOMO_RESIDENTIAL_PORT: '7777',
+    MOMO_RESIDENTIAL_USERNAME: 'test-user',
+    MOMO_RESIDENTIAL_PASSWORD: 'test-password',
   });
   const calls = [];
   globalThis.fetch = async (url, options) => {
@@ -48,6 +56,7 @@ test('Momo feed requests only the selected source with its required UA', async (
       assert.deepEqual(calls, expectedCalls);
       const profile = JSON.parse(response.body);
       const tags = profile.outbounds.map(outbound => outbound.tag);
+      assert.ok(!tags.includes('PHONE-RESIDENTIAL'));
       assert.deepEqual(expectedCounts, [tags.filter(tag => tag?.startsWith('A ')).length,
         tags.filter(tag => tag?.startsWith('B ')).length]);
       assert.equal(profile.dns.strategy, source === 'A' ? 'prefer_ipv4' : 'ipv4_only');
@@ -68,6 +77,11 @@ test('Momo feed requests only the selected source with its required UA', async (
         assert.equal(hy2.tls.server_name, 'h.example.test');
       }
     }
+    process.env.MOMO_PHONE_MODE_ENABLED = '1';
+    const enabledResponse = { headers: {}, setHeader(k, v) { this.headers[k] = v; }, end(body) { this.body = body; } };
+    await handler({ method: 'GET', url: `/api/momo?source=B&key=${'a'.repeat(24)}` }, enabledResponse);
+    assert.equal(enabledResponse.statusCode, 200);
+    assert.ok(JSON.parse(enabledResponse.body).outbounds.some(outbound => outbound.tag === 'PHONE-RESIDENTIAL'));
   } finally {
     globalThis.fetch = originalFetch;
     for (const [name, value] of Object.entries(originalEnv)) {

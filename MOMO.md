@@ -40,7 +40,7 @@ A 的完整节点来自 `Clash.Meta` UA。生成器从同一份订阅的 `dns.na
 
 当前路由器是 sing-box 1.12.25，软件源也只提供此版本。按来源 MAC 匹配 IPv4/IPv6 需要 sing-box 1.14；本机使用官方 1.14.1 检查过本草案的配置语法，但尚未在路由器上升级或验证实际流量。
 
-可选环境变量全部填写后，A、B 两份配置都会加入一加 6T 的独立规则：`MOMO_PHONE_24G_MAC`、`MOMO_RESIDENTIAL_SERVER`、`MOMO_RESIDENTIAL_PORT`、`MOMO_RESIDENTIAL_USERNAME`、`MOMO_RESIDENTIAL_PASSWORD`。缺任何一项时接口拒绝生成新配置；全部不填则现有配置不变。住宅代理账号密码只应放在私有环境变量，不能提交到 Git。**此实现会把住宅代理账号密码放进 Vercel 返回给路由器的完整配置；启用前需要明确接受该存储与传输方式。**
+默认 `MOMO_PHONE_MODE_ENABLED=0`；即使提前填写代理信息，也继续返回原配置。升级核心并验证防火墙后改为 `1`，A、B 两份配置才会加入一加 6T 的独立规则。此时须完整填写：`MOMO_PHONE_24G_MAC`、`MOMO_RESIDENTIAL_SERVER`、`MOMO_RESIDENTIAL_PORT`、`MOMO_RESIDENTIAL_USERNAME`、`MOMO_RESIDENTIAL_PASSWORD`。缺任何一项时接口拒绝生成新配置。住宅代理账号密码只应放在私有环境变量，不能提交到 Git。**此实现会把住宅代理账号密码放进 Vercel 返回给路由器的完整配置；启用前需要明确接受该存储与传输方式。**
 
 在 Zashboard 使用顶部模式切换：`Rule` 为原分流、`Global` 为住宅代理、`Direct` 为直连。只有指定的 2.4G MAC 使用这三个模式；5G MAC 和其他设备继续执行原分流。住宅模式下普通 UDP 被拒绝，住宅 DNS 走住宅 SOCKS5 出口，IPv6 TCP 也尝试从住宅出口发送；若该产品不支持 IPv6 目标，则连接失败而不会回退到普通节点。`Direct` 只表示手机 2.4G 的流量直连，不能作为银行 App 的防泄漏模式。
 
