@@ -58,6 +58,7 @@ export default async function handler(req, res) {
       Number(process.env.MOMO_MIN_A || 61),
       Number(process.env.MOMO_MIN_B || 118),
       source,
+      process.env.MOMO_WAN_INTERFACE || 'pppoe-wan',
     );
     res.statusCode = 200;
     return res.end(JSON.stringify(profile));

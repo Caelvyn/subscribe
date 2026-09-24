@@ -14,6 +14,7 @@
 | `MOMO_FEED_TOKEN` | 至少 24 字符的随机密钥，用于保护订阅入口 |
 | `MOMO_MIN_A` | 可选，默认 `61`；A 节点不足时拒绝更新 |
 | `MOMO_MIN_B` | 可选，默认 `118`；B 节点不足时拒绝更新 |
+| `MOMO_WAN_INTERFACE` | 可选，A 节点专用 DNS 直连接口；当前主路由默认 `pppoe-wan` |
 
 本地私有值在 `D:\codex\2026-09-23\momo\.private\`：`sources.local.json`、`clash-api-secret.txt`、`vercel-feed-token.txt`。不要把这些文件或带密钥的完整订阅 URL 提交到 Git；`.env*` 也已排除。
 
@@ -22,10 +23,12 @@
 ## Momo 设置
 
 1. **页面填写配置**：Momo → 配置文件 → 订阅，分别新增 A 和 B 两个订阅；链接填各自受保护地址，UA 都填 `sing-box`，优先选“远程”。此 UA 只用于请求本入口，上游 UA 由入口固定设置。
-2. **页面开关**：先选中 B 订阅并开启“检查配置文件”；A 可单独切换排错。代理配置中的 TCP Redirect、UDP TPROXY、DNS 劫持及 LAN 开关按 `D:\codex\2026-09-23\momo\README.md` 设置。每次只运行一个订阅，因此 Zashboard 只会显示当前订阅中的节点。
+2. **页面开关**：按需要选中 A 或 B 订阅并开启“检查配置文件”。代理配置中的 TCP Redirect、UDP TPROXY、DNS 劫持及 LAN 开关按 `D:\codex\2026-09-23\momo\README.md` 设置。每次只运行一个订阅，因此 Zashboard 只会显示当前订阅中的节点。
 3. **页面按钮**：点击“更新”后还要点击“重载”或“重启服务”，Momo 才会运行新配置。“优先远程”只在服务启动时重新下载当前选中的订阅；未选中的订阅需要单独定时更新。
 
-当前路由器已设置每日 02:30 更新 A、02:40 更新 B、03:00 重启 Momo（均为路由器本地时间）。A/B 订阅更新只更换缓存，03:00 重启时应用当前选中的订阅。当前选择 B，运行态为 118 个节点。
+当前路由器已设置每日 02:30 更新 A、02:40 更新 B、03:00 重启 Momo（均为路由器本地时间）。A/B 订阅更新只更换缓存，03:00 重启时应用当前选中的订阅。
+
+A 的完整节点来自 `Clash.Meta` UA。生成器从同一份订阅的 `dns.nameserver-policy` 读取适用于节点服务器域名的专用 HTTPS DNS，并为每个 A 节点设置 `domain_resolver`；DNS 的地址和路径随上游订阅更新，不写入仓库。A 配置保留 IPv6，需手动选择实测支持 IPv6 出口的节点。B 配置暂用 `ipv4_only`，因为抽测 B 节点的 IPv6 目标连接失败；这只影响 B 的 DNS 配置，不关闭路由器 LAN 的 IPv6 广播。
 
 分流规则对 Google 常用域名明确指定代理及代理 DNS，避免其中国大陆 CDN IP 命中 `geoip-cn` 后直连；广告规则仍先匹配。WireGuard 使用的私网地址由 `ip_is_private` 规则直连。
 
