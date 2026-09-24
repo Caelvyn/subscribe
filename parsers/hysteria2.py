@@ -29,7 +29,7 @@ def parse(data):
         node['down_mbps'] = int(re.search(r'\d+', netquery['downmbps']).group())
     if ports_match:
         node['server_ports'] = [ports_match.group(1).replace('-', ':')]
-    elif netquery['mport']:
+    elif netquery.get('mport'):
         node['server_ports'] = [netquery['mport'].replace('-', ':')]
     if netquery.get('insecure') in ['1', 'true'] or netquery.get('allowInsecure') == '1':
         node['tls']['insecure'] = True

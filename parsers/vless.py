@@ -3,11 +3,14 @@ from urllib.parse import urlparse, parse_qs, unquote
 def parse(data):
     info = data[:]
     server_info = urlparse(info)
+    netloc = server_info.netloc
     try:
-        netloc = tool.b64Decode(server_info.netloc).decode('utf-8')
+        netloc = tool.b64Decode(server_info.netloc).decode('utf-8') #fuck
+        decoded = True
     except:
-        netloc = server_info.netloc
-    _netloc = netloc.split("@")
+        decoded = False
+    _netloc = netloc.rsplit("@", 1)
+    uuid = _netloc[0].split(':', 1)[-1] if decoded else _netloc[0]
     try:
         _netloc_parts = _netloc[1].rsplit(":", 1)
     except:
@@ -30,9 +33,11 @@ def parse(data):
         'type': 'vless',
         'server': server,
         'server_port': server_port,
-        'uuid': _netloc[0].split(':', 1)[-1],
-        'packet_encoding': netquery.get('packetEncoding', 'xudp')
+        'uuid': uuid,
     }
+    packet_encoding = netquery.get('packetEncoding')
+    if packet_encoding and packet_encoding.lower() != "none":
+        node['packet_encoding'] = packet_encoding
     flow = netquery.get('flow')
     if flow and flow.lower() != 'none':
         node['flow'] = flow
@@ -90,6 +95,8 @@ def parse(data):
                 'type':'grpc',
                 'service_name':netquery.get('serviceName', '')
             }
+        elif netquery['type'] == 'xhttp':
+            return None # 不支持xhttp
     elif netquery.get('obfs'):  #shadowrocket
         if netquery['obfs'] == 'websocket':
             matches = re.search(r'\?ed=(\d+)$', netquery.get('path', '/'))

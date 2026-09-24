@@ -185,6 +185,8 @@ def clash2v2ray(share_link):
             "fp": share_link.get('client-fingerprint', ''),
             "type": share_link.get('network', 'tcp'),
             "flow": share_link.get('flow', ''),
+            "packetEncoding": share_link.get('packet-encoding', ''),
+            "encryption": share_link.get('encryption', ''),
             'allowInsecure': '1' if share_link.get('skip-cert-verify') == True else '0',
             "name": quote(share_link['name'], 'utf-8')
         }
@@ -195,7 +197,7 @@ def clash2v2ray(share_link):
         if vless_info['type'] == 'ws':
             vless_info["path"] = quote(share_link['ws-opts'].get('path', ''), 'utf-8') if share_link.get('ws-opts') else share_link.get('ws-path', '')
             vless_info["host"] = share_link['ws-opts'].get('headers', {}).get('Host', '') if share_link.get('ws-opts') else share_link.get('ws-headers', {}).get('Host', '')
-            link = "vless://{uuid}@{server}:{port}?encryption=none&security={security}&sni={sni}&fp={fp}&type={type}&host={host}&path={path}&flow={flow}&allowInsecure={allowInsecure}".format(**vless_info)
+            link = "vless://{uuid}@{server}:{port}?encryption=none&security={security}&sni={sni}&fp={fp}&type={type}&host={host}&path={path}&flow={flow}&packetEncoding={packetEncoding}&encryption={encryption}&allowInsecure={allowInsecure}".format(**vless_info)
         elif vless_info['type'] == 'grpc':
             if share_link.get('grpc-opts', {}).get('grpc-service-name', '') not in ['/', ''] :
                 vless_info["serviceName"] = unquote(share_link.get('grpc-opts').get('grpc-service-name'))
@@ -205,17 +207,17 @@ def clash2v2ray(share_link):
                 vless_info["security"] = 'reality'
                 vless_info["pbk"] = share_link['reality-opts']['public-key']
                 vless_info["sid"] = share_link.get('reality-opts', {}).get('short-id', '')
-                link = "vless://{uuid}@{server}:{port}?encryption=none&security={security}&sni={sni}&type={type}&serviceName={serviceName}&fp={fp}&flow={flow}&allowInsecure={allowInsecure}&pbk={pbk}&sid={sid}".format(**vless_info)
+                link = "vless://{uuid}@{server}:{port}?encryption=none&security={security}&sni={sni}&type={type}&serviceName={serviceName}&fp={fp}&flow={flow}&packetEncoding={packetEncoding}&encryption={encryption}&allowInsecure={allowInsecure}&pbk={pbk}&sid={sid}".format(**vless_info)
             else:
-                link = "vless://{uuid}@{server}:{port}?encryption=none&security={security}&sni={sni}&type={type}&serviceName={serviceName}&fp={fp}&flow={flow}&allowInsecure={allowInsecure}".format(**vless_info)
+                link = "vless://{uuid}@{server}:{port}?encryption=none&security={security}&sni={sni}&type={type}&serviceName={serviceName}&fp={fp}&flow={flow}&packetEncoding={packetEncoding}&encryption={encryption}&allowInsecure={allowInsecure}".format(**vless_info)
         elif vless_info['type'] == 'tcp':
             if share_link.get('reality-opts'):
                 vless_info["security"] = 'reality'
                 vless_info["pbk"] = share_link['reality-opts']['public-key']
                 vless_info["sid"] = share_link.get('reality-opts', {}).get('short-id', '')
-                link = "vless://{uuid}@{server}:{port}?encryption=none&security={security}&sni={sni}&serverName={sni}&type={type}&fp={fp}&flow={flow}&allowInsecure={allowInsecure}&pbk={pbk}&sid={sid}".format(**vless_info)
+                link = "vless://{uuid}@{server}:{port}?encryption=none&security={security}&sni={sni}&serverName={sni}&type={type}&fp={fp}&flow={flow}&packetEncoding={packetEncoding}&encryption={encryption}&allowInsecure={allowInsecure}&pbk={pbk}&sid={sid}".format(**vless_info)
             else:
-                link = "vless://{uuid}@{server}:{port}?encryption=none&security={security}&sni={sni}&serverName={sni}&type={type}&fp={fp}&flow={flow}&allowInsecure={allowInsecure}".format(**vless_info)
+                link = "vless://{uuid}@{server}:{port}?encryption=none&security={security}&sni={sni}&serverName={sni}&type={type}&fp={fp}&flow={flow}&packetEncoding={packetEncoding}&encryption={encryption}&allowInsecure={allowInsecure}".format(**vless_info)
         if share_link.get('smux',{}).get('enabled', '') == True:
             vless_info["protocol"] = share_link['smux']['protocol']
             vless_info["max_connections"] = share_link['smux'].get('max-connections','')
