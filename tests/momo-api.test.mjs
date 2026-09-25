@@ -7,7 +7,8 @@ const originalFetch = globalThis.fetch;
 const originalEnv = Object.fromEntries(
   ['MOMO_SOURCE_A', 'MOMO_SOURCE_B', 'MOMO_API_SECRET', 'MOMO_FEED_TOKEN', 'MOMO_MIN_A', 'MOMO_MIN_B', 'MOMO_WAN_INTERFACE',
     'MOMO_PHONE_MODE_ENABLED', 'MOMO_PHONE_24G_MAC', 'MOMO_PHONE_24G_IP', 'MOMO_RESIDENTIAL_SERVER', 'MOMO_RESIDENTIAL_PORT',
-    'MOMO_RESIDENTIAL_USERNAME', 'MOMO_RESIDENTIAL_PASSWORD']
+    'MOMO_RESIDENTIAL_USERNAME', 'MOMO_RESIDENTIAL_PASSWORD', 'MOMO_INDEPENDENT_PHONE_MODES',
+    'MOMO_OPPO_MAC', 'MOMO_OPPO_IP', 'MOMO_EXTRA_PHONES_JSON']
     .map(name => [name, process.env[name]]),
 );
 
@@ -27,6 +28,7 @@ test('Momo feed requests only the selected source with its required UA', async (
     MOMO_RESIDENTIAL_PORT: '7777',
     MOMO_RESIDENTIAL_USERNAME: 'test-user',
     MOMO_RESIDENTIAL_PASSWORD: 'test-password',
+    MOMO_INDEPENDENT_PHONE_MODES: '0',
   });
   const calls = [];
   globalThis.fetch = async (url, options) => {
@@ -83,6 +85,24 @@ test('Momo feed requests only the selected source with its required UA', async (
     await handler({ method: 'GET', url: `/api/momo?source=B&key=${'a'.repeat(24)}` }, enabledResponse);
     assert.equal(enabledResponse.statusCode, 200);
     assert.ok(JSON.parse(enabledResponse.body).outbounds.some(outbound => outbound.tag === 'PHONE-RESIDENTIAL'));
+    process.env.MOMO_INDEPENDENT_PHONE_MODES = '1';
+    process.env.MOMO_OPPO_MAC = '02:00:00:00:00:25';
+    process.env.MOMO_OPPO_IP = '192.168.1.232';
+    const independentResponse = { headers: {}, setHeader(k, v) { this.headers[k] = v; }, end(body) { this.body = body; } };
+    await handler({ method: 'GET', url: `/api/momo?source=B&key=${'a'.repeat(24)}` }, independentResponse);
+    assert.equal(independentResponse.statusCode, 200);
+    assert.deepEqual(JSON.parse(independentResponse.body).outbounds
+      .filter(outbound => outbound.tag?.startsWith('PHONE-SELECT-')).map(outbound => outbound.tag),
+    ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO']);
+    process.env.MOMO_EXTRA_PHONES_JSON = JSON.stringify([
+      { id: 'OTHER', mac: '02:00:00:00:00:26', ip: '192.168.1.233' },
+    ]);
+    const extraResponse = { headers: {}, setHeader(k, v) { this.headers[k] = v; }, end(body) { this.body = body; } };
+    await handler({ method: 'GET', url: `/api/momo?source=B&key=${'a'.repeat(24)}` }, extraResponse);
+    assert.equal(extraResponse.statusCode, 200);
+    assert.deepEqual(JSON.parse(extraResponse.body).outbounds
+      .filter(outbound => outbound.tag?.startsWith('PHONE-SELECT-')).map(outbound => outbound.tag),
+    ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO', 'PHONE-SELECT-OTHER']);
   } finally {
     globalThis.fetch = originalFetch;
     for (const [name, value] of Object.entries(originalEnv)) {
@@ -130,4 +150,39 @@ test('phone modes scope residential and direct routing to the 2.4G MAC', () => {
     ]);
   assert.equal(profile.dns.servers.find(server => server.tag === 'dns-phone-residential').detour,
     'PHONE-RESIDENTIAL');
+});
+
+test('independent phone selectors retain normal split and isolate both devices', () => {
+  const profile = profileBuilder.buildProfile('', JSON.stringify({ outbounds: [
+    { type: 'anytls', tag: 'B1', server: 'b.example.test', server_port: 443, password: 'test' },
+  ] }), 'api-secret', 0, 1, 'B', 'pppoe-wan', {
+    independent: true, server: 'proxy.example.test', port: '7777',
+    username: 'test-user', password: 'test-password',
+    devices: [
+      { id: '6T', mac: '02:00:00:00:00:24', ip: '192.168.1.231' },
+      { id: 'OPPO', mac: '02:00:00:00:00:25', ip: '192.168.1.232' },
+    ],
+  });
+  const selectors = profile.outbounds.filter(outbound => outbound.tag?.startsWith('PHONE-SELECT-'));
+  assert.deepEqual(selectors.map(outbound => outbound.tag), ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO']);
+  assert.ok(selectors.every(outbound => outbound.default === 'PHONE-NORMAL' &&
+    outbound.interrupt_exist_connections === true &&
+    JSON.stringify(outbound.outbounds) === JSON.stringify(['PHONE-NORMAL', 'PHONE-RESIDENTIAL', 'DIRECT'])));
+  assert.deepEqual(profile.inbounds.find(inbound => inbound.tag === 'phone-normal-in'),
+    { type: 'socks', tag: 'phone-normal-in', listen: '127.0.0.1', listen_port: 10556 });
+  assert.deepEqual(profile.outbounds.find(outbound => outbound.tag === 'PHONE-NORMAL'),
+    { type: 'socks', tag: 'PHONE-NORMAL', server: '127.0.0.1', server_port: 10556, version: '5' });
+  const phoneRoutes = profile.route.rules.filter(rule => rule.outbound?.startsWith('PHONE-SELECT-'));
+  assert.deepEqual(phoneRoutes.map(rule => rule.outbound),
+    ['PHONE-SELECT-6T', 'PHONE-SELECT-6T', 'PHONE-SELECT-OPPO', 'PHONE-SELECT-OPPO']);
+  assert.ok(profile.route.rules.indexOf(phoneRoutes[0]) <
+    profile.route.rules.findIndex(rule => rule.rule_set === 'ads'));
+  assert.equal(profile.route.final, 'PROXY');
+  const oppoDns = profile.dns.rules.filter(rule => rule.server?.startsWith('dns-phone-OPPO-'));
+  assert.deepEqual(oppoDns.map(rule => rule.server),
+    ['dns-phone-OPPO-cn', 'dns-phone-OPPO-global', 'dns-phone-OPPO-cn', 'dns-phone-OPPO-global']);
+  assert.ok(oppoDns.every(rule => rule.source_mac_address?.[0] === '02:00:00:00:00:25' ||
+    rule.source_ip_cidr?.[0] === '192.168.1.232/32'));
+  assert.equal(profile.dns.servers.find(server => server.tag === 'dns-phone-OPPO-global').detour,
+    'PHONE-SELECT-OPPO');
 });

@@ -51,6 +51,26 @@ export default async function handler(req, res) {
       source === 'B' ? '' : fetchSubscription(MOMO_SOURCE_A, 'Clash.Meta'),
       source === 'A' ? '' : fetchSubscription(MOMO_SOURCE_B, 'sing-box'),
     ]);
+    const phone = process.env.MOMO_PHONE_MODE_ENABLED === '1' ? {
+      mac: process.env.MOMO_PHONE_24G_MAC,
+      ip: process.env.MOMO_PHONE_24G_IP,
+      server: process.env.MOMO_RESIDENTIAL_SERVER,
+      port: process.env.MOMO_RESIDENTIAL_PORT,
+      username: process.env.MOMO_RESIDENTIAL_USERNAME,
+      password: process.env.MOMO_RESIDENTIAL_PASSWORD,
+    } : undefined;
+    if (phone && process.env.MOMO_INDEPENDENT_PHONE_MODES === '1') {
+      phone.independent = true;
+      phone.devices = [{ id: '6T', mac: phone.mac, ip: phone.ip }];
+      const oppoMac = process.env.MOMO_OPPO_MAC;
+      const oppoIp = process.env.MOMO_OPPO_IP;
+      if (oppoMac || oppoIp) phone.devices.push({ id: 'OPPO', mac: oppoMac, ip: oppoIp });
+      if (process.env.MOMO_EXTRA_PHONES_JSON) {
+        const extra = JSON.parse(process.env.MOMO_EXTRA_PHONES_JSON);
+        if (!Array.isArray(extra)) throw new Error('Invalid extra phone list');
+        phone.devices.push(...extra);
+      }
+    }
     const profile = buildProfile(
       aText,
       bText,
@@ -59,14 +79,7 @@ export default async function handler(req, res) {
       Number(process.env.MOMO_MIN_B || 118),
       source,
       process.env.MOMO_WAN_INTERFACE || 'pppoe-wan',
-      process.env.MOMO_PHONE_MODE_ENABLED === '1' ? {
-        mac: process.env.MOMO_PHONE_24G_MAC,
-        ip: process.env.MOMO_PHONE_24G_IP,
-        server: process.env.MOMO_RESIDENTIAL_SERVER,
-        port: process.env.MOMO_RESIDENTIAL_PORT,
-        username: process.env.MOMO_RESIDENTIAL_USERNAME,
-        password: process.env.MOMO_RESIDENTIAL_PASSWORD,
-      } : undefined,
+      phone,
     );
     res.statusCode = 200;
     return res.end(JSON.stringify(profile));

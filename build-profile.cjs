@@ -108,6 +108,7 @@ function buildA(clashText, wanInterface) {
 
 function addPhoneMode(profile, phone) {
   if (!phone || Object.values(phone).every(value => value === undefined || value === '')) return;
+  if (phone.independent === true) return addIndependentPhoneModes(profile, phone);
   const { mac, ip, server, port, username, password } = phone;
   if (![mac, ip, server, port, username, password].every(value => value !== undefined && value !== '')) {
     throw new Error('Incomplete phone residential proxy settings');
@@ -140,6 +141,69 @@ function addPhoneMode(profile, phone) {
     ...phoneMatches.map(match => ({ ...match, clash_mode: 'Global', action: 'route', outbound: 'PHONE-RESIDENTIAL' })),
     ...phoneMatches.map(match => ({ ...match, clash_mode: 'Direct', action: 'route', outbound: 'DIRECT' })),
   );
+}
+
+function addIndependentPhoneModes(profile, phone) {
+  const { server, port, username, password, devices } = phone;
+  if (![server, port, username, password].every(value => value !== undefined && value !== '') ||
+      !Array.isArray(devices) || devices.length === 0) {
+    throw new Error('Incomplete independent phone settings');
+  }
+  if (!Number.isInteger(Number(port)) || Number(port) < 1 || Number(port) > 65535) {
+    throw new Error('Invalid residential proxy port');
+  }
+  const ids = new Set();
+  const addresses = new Set();
+  for (const { id, mac, ip } of devices) {
+    if (!/^[A-Za-z0-9-]+$/.test(id) || ids.has(id)) throw new Error('Invalid or duplicate phone id');
+    if (!/^([0-9a-f]{2}:){5}[0-9a-f]{2}$/i.test(mac) || net.isIP(ip) !== 4) {
+      throw new Error('Invalid phone address');
+    }
+    if (addresses.has(mac.toLowerCase()) || addresses.has(ip)) throw new Error('Duplicate phone address');
+    ids.add(id);
+    addresses.add(mac.toLowerCase());
+    addresses.add(ip);
+  }
+
+  profile.inbounds.push({ type: 'socks', tag: 'phone-normal-in', listen: '127.0.0.1', listen_port: 10556 });
+  profile.outbounds.push(
+    { type: 'socks', tag: 'PHONE-NORMAL', server: '127.0.0.1', server_port: 10556, version: '5' },
+    { type: 'socks', tag: 'PHONE-RESIDENTIAL', server, server_port: Number(port),
+      version: '5', username, password, network: 'tcp', domain_resolver: 'dns-cn' },
+  );
+
+  const routeRules = [];
+  const dnsRules = [];
+  for (const { id, mac, ip } of devices) {
+    const selector = `PHONE-SELECT-${id}`;
+    const cnDns = `dns-phone-${id}-cn`;
+    const globalDns = `dns-phone-${id}-global`;
+    const matches = [
+      { source_mac_address: [mac.toLowerCase()] },
+      { source_ip_cidr: [`${ip}/32`] },
+    ];
+    profile.outbounds.push({
+      type: 'selector', tag: selector,
+      outbounds: ['PHONE-NORMAL', 'PHONE-RESIDENTIAL', 'DIRECT'],
+      default: 'PHONE-NORMAL', interrupt_exist_connections: true,
+    });
+    profile.dns.servers.push(
+      { type: 'https', tag: cnDns, server: '223.5.5.5',
+        tls: { enabled: true, server_name: 'dns.alidns.com' }, detour: selector },
+      { type: 'https', tag: globalDns, server: '1.1.1.1', detour: selector },
+    );
+    for (const match of matches) {
+      routeRules.push({ ...match, action: 'route', outbound: selector });
+      dnsRules.push(
+        { ...match, rule_set: 'geosite-cn', action: 'route', server: cnDns },
+        { ...match, action: 'route', server: globalDns },
+      );
+    }
+  }
+  // A loopback SOCKS inbound turns normal split routing into one selectable
+  // outbound. Its source is 127.0.0.1, so it follows the regular rules below.
+  profile.route.rules.splice(5, 0, ...routeRules);
+  profile.dns.rules.splice(3, 0, ...dnsRules);
 }
 
 function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, source = 'AB', wanInterface = 'pppoe-wan', phone) {
