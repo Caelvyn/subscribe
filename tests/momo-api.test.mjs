@@ -158,7 +158,7 @@ test('independent phone selectors retain normal split and isolate both devices',
     { type: 'anytls', tag: '香港 HK', server: 'hk.example.test', server_port: 443, password: 'test' },
   ] }), 'api-secret', 0, 1, 'B', 'pppoe-wan', {
     independent: true, server: 'proxy.example.test', port: '7777',
-    username: 'customer-test-cc-DE-sessid-abc123', password: 'test-password',
+    username: 'customer-test-cc-DE-city-berlin-sessid-abc123', password: 'test-password',
     devices: [
       { id: '6T', mac: '02:00:00:00:00:24', ip: '192.168.1.231' },
       { id: 'OPPO', mac: '02:00:00:00:00:25', ip: '192.168.1.232' },
@@ -194,7 +194,7 @@ test('independent phone selectors retain normal split and isolate both devices',
     ['RES-DE', 'RES-GB', 'RES-US', 'RES-JP', 'RES-PH']);
   assert.deepEqual(profile.outbounds.filter(outbound => outbound.tag?.startsWith('RES-'))
     .map(outbound => [outbound.tag, outbound.username, outbound.detour]), [
-      ['RES-DE', 'customer-test-cc-DE-sessid-abc123', 'RESIDENTIAL-RELAY'],
+      ['RES-DE', 'customer-test-cc-DE-city-berlin-sessid-abc123', 'RESIDENTIAL-RELAY'],
       ['RES-GB', 'customer-test-cc-GB-sessid-abc123', 'RESIDENTIAL-RELAY'],
       ['RES-US', 'customer-test-cc-US-sessid-abc123', 'RESIDENTIAL-RELAY'],
       ['RES-JP', 'customer-test-cc-JP-sessid-abc123', 'RESIDENTIAL-RELAY'],

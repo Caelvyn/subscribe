@@ -180,9 +180,11 @@ function addIndependentPhoneModes(profile, phone) {
     default: 'RES-DE', interrupt_exist_connections: true,
   });
   for (const code of countryCodes) {
+    const countryUsername = code === 'DE' ? username :
+      username.replace(/-cc-[a-z]{2}(?:-city-[a-z0-9_]+)?(?=-|$)/i, `-cc-${code}`);
     profile.outbounds.push({
       type: 'socks', tag: `RES-${code}`, server, server_port: Number(port),
-      version: '5', username: username.replace(/-cc-[a-z]{2}(?=-|$)/i, `-cc-${code}`),
+      version: '5', username: countryUsername,
       password, network: 'tcp', detour: 'RESIDENTIAL-RELAY',
     });
   }
