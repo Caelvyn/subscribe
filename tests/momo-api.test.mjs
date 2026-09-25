@@ -191,14 +191,14 @@ test('independent phone selectors retain normal split and isolate both devices',
     default: 'DIRECT', interrupt_exist_connections: true,
   });
   assert.deepEqual(profile.outbounds.find(outbound => outbound.tag === 'PHONE-RESIDENTIAL').outbounds,
-    ['RES-DE', 'RES-GB', 'RES-US', 'RES-JP', 'RES-PH']);
+    ['RES-DE-Berlin', 'RES-GB-London', 'RES-US-NewYork', 'RES-JP-Tokyo', 'RES-PH-Manila']);
   assert.deepEqual(profile.outbounds.filter(outbound => outbound.tag?.startsWith('RES-'))
     .map(outbound => [outbound.tag, outbound.username, outbound.detour]), [
-      ['RES-DE', 'customer-test-cc-DE-city-berlin-sessid-abc123', 'RESIDENTIAL-RELAY'],
-      ['RES-GB', 'customer-test-cc-GB-sessid-abc123', 'RESIDENTIAL-RELAY'],
-      ['RES-US', 'customer-test-cc-US-sessid-abc123', 'RESIDENTIAL-RELAY'],
-      ['RES-JP', 'customer-test-cc-JP-sessid-abc123', 'RESIDENTIAL-RELAY'],
-      ['RES-PH', 'customer-test-cc-PH-sessid-abc123', 'RESIDENTIAL-RELAY'],
+      ['RES-DE-Berlin', 'customer-test-cc-DE-city-berlin-sessid-abc123', 'RESIDENTIAL-RELAY'],
+      ['RES-GB-London', 'customer-test-cc-GB-city-london-sessid-abc123GB', 'RESIDENTIAL-RELAY'],
+      ['RES-US-NewYork', 'customer-test-cc-US-city-new_york-sessid-abc123US', 'RESIDENTIAL-RELAY'],
+      ['RES-JP-Tokyo', 'customer-test-cc-JP-city-tokyo-sessid-abc123JP', 'RESIDENTIAL-RELAY'],
+      ['RES-PH-Manila', 'customer-test-cc-PH-city-manila-sessid-abc123PH', 'RESIDENTIAL-RELAY'],
     ]);
   const ai = profile.outbounds.find(outbound => outbound.tag === 'AI-SERVICES');
   assert.equal(ai.default, 'PROXY');

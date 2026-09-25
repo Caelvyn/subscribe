@@ -165,7 +165,9 @@ function addIndependentPhoneModes(profile, phone) {
     addresses.add(ip);
   }
 
-  const countryCodes = ['DE', 'GB', 'US', 'JP', 'PH'];
+  const cities = { DE: 'berlin', GB: 'london', US: 'new_york', JP: 'tokyo', PH: 'manila' };
+  const cityLabels = { DE: 'Berlin', GB: 'London', US: 'NewYork', JP: 'Tokyo', PH: 'Manila' };
+  const countryCodes = Object.keys(cities);
   if (!/-cc-[a-z]{2}(?=-|$)/i.test(username)) {
     throw new Error('Residential username must contain a country parameter');
   }
@@ -174,16 +176,20 @@ function addIndependentPhoneModes(profile, phone) {
     type: 'selector', tag: 'RESIDENTIAL-RELAY', outbounds: ['DIRECT', ...relayTags],
     default: 'DIRECT', interrupt_exist_connections: true,
   });
-  const countryTags = countryCodes.map(code => `RES-${code}`);
+  const countryTags = countryCodes.map(code => `RES-${code}-${cityLabels[code]}`);
   profile.outbounds.push({
     type: 'selector', tag: 'PHONE-RESIDENTIAL', outbounds: countryTags,
-    default: 'RES-DE', interrupt_exist_connections: true,
+    default: countryTags[0], interrupt_exist_connections: true,
   });
   for (const code of countryCodes) {
-    const countryUsername = code === 'DE' ? username :
-      username.replace(/-cc-[a-z]{2}(?:-city-[a-z0-9_]+)?(?=-|$)/i, `-cc-${code}`);
+    let countryUsername = username.replace(/-cc-[a-z]{2}(?:-city-[a-z0-9_]+)?(?=-|$)/i,
+      `-cc-${code}-city-${cities[code]}`);
+    if (code !== 'DE') {
+      countryUsername = countryUsername.replace(/-sessid-([a-z0-9]+)(?=-|$)/i,
+        (_, id) => `-sessid-${id}${code}`);
+    }
     profile.outbounds.push({
-      type: 'socks', tag: `RES-${code}`, server, server_port: Number(port),
+      type: 'socks', tag: `RES-${code}-${cityLabels[code]}`, server, server_port: Number(port),
       version: '5', username: countryUsername,
       password, network: 'tcp', detour: 'RESIDENTIAL-RELAY',
     });
