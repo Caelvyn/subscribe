@@ -165,11 +165,31 @@ function addIndependentPhoneModes(profile, phone) {
     addresses.add(ip);
   }
 
+  const countryCodes = ['DE', 'GB', 'US', 'JP', 'PH'];
+  if (!/-cc-[a-z]{2}(?=-|$)/i.test(username)) {
+    throw new Error('Residential username must contain a country parameter');
+  }
+  const relayTags = profile.outbounds[0].outbounds;
+  profile.outbounds.push({
+    type: 'selector', tag: 'RESIDENTIAL-RELAY', outbounds: ['DIRECT', ...relayTags],
+    default: 'DIRECT', interrupt_exist_connections: true,
+  });
+  const countryTags = countryCodes.map(code => `RES-${code}`);
+  profile.outbounds.push({
+    type: 'selector', tag: 'PHONE-RESIDENTIAL', outbounds: countryTags,
+    default: 'RES-DE', interrupt_exist_connections: true,
+  });
+  for (const code of countryCodes) {
+    profile.outbounds.push({
+      type: 'socks', tag: `RES-${code}`, server, server_port: Number(port),
+      version: '5', username: username.replace(/-cc-[a-z]{2}(?=-|$)/i, `-cc-${code}`),
+      password, network: 'tcp', detour: 'RESIDENTIAL-RELAY',
+    });
+  }
+
   profile.inbounds.push({ type: 'socks', tag: 'phone-normal-in', listen: '127.0.0.1', listen_port: 10556 });
   profile.outbounds.push(
     { type: 'socks', tag: 'PHONE-NORMAL', server: '127.0.0.1', server_port: 10556, version: '5' },
-    { type: 'socks', tag: 'PHONE-RESIDENTIAL', server, server_port: Number(port),
-      version: '5', username, password, network: 'tcp', domain_resolver: 'dns-cn' },
   );
 
   const routeRules = [];
@@ -237,6 +257,19 @@ function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, so
   profile.outbounds[0].default = nodeTags[0];
   profile.outbounds.push(...aNodes, ...bNodes);
   profile.experimental.clash_api.secret = need(apiSecret, 'API secret');
+  const aiDomains = [
+    'chatgpt.com', 'openai.com', 'oaistatic.com', 'oaiusercontent.com',
+    'oaistatsig.com', 'claude.ai', 'anthropic.com', 'gemini.google.com',
+    'generativelanguage.googleapis.com',
+  ];
+  profile.outbounds.push({
+    type: 'selector', tag: 'AI-SERVICES',
+    outbounds: ['PROXY', ...nodeTags.filter(tag => !/(香港|🇭🇰|Hong\s*Kong|\bHK\b)/i.test(tag)), 'DIRECT'],
+    default: 'PROXY', interrupt_exist_connections: true,
+  });
+  profile.dns.servers.push({ type: 'https', tag: 'dns-ai', server: '1.1.1.1', detour: 'AI-SERVICES' });
+  profile.dns.rules.splice(3, 0, { domain_suffix: aiDomains, action: 'route', server: 'dns-ai' });
+  profile.route.rules.splice(7, 0, { domain_suffix: aiDomains, action: 'route', outbound: 'AI-SERVICES' });
   addPhoneMode(profile, phone);
   return profile;
 }

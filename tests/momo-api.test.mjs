@@ -26,7 +26,7 @@ test('Momo feed requests only the selected source with its required UA', async (
     MOMO_PHONE_24G_IP: '192.168.1.231',
     MOMO_RESIDENTIAL_SERVER: 'proxy.example.test',
     MOMO_RESIDENTIAL_PORT: '7777',
-    MOMO_RESIDENTIAL_USERNAME: 'test-user',
+    MOMO_RESIDENTIAL_USERNAME: 'customer-test-cc-DE-sessid-abc123',
     MOMO_RESIDENTIAL_PASSWORD: 'test-password',
     MOMO_INDEPENDENT_PHONE_MODES: '0',
   });
@@ -155,9 +155,10 @@ test('phone modes scope residential and direct routing to the 2.4G MAC', () => {
 test('independent phone selectors retain normal split and isolate both devices', () => {
   const profile = profileBuilder.buildProfile('', JSON.stringify({ outbounds: [
     { type: 'anytls', tag: 'B1', server: 'b.example.test', server_port: 443, password: 'test' },
+    { type: 'anytls', tag: '香港 HK', server: 'hk.example.test', server_port: 443, password: 'test' },
   ] }), 'api-secret', 0, 1, 'B', 'pppoe-wan', {
     independent: true, server: 'proxy.example.test', port: '7777',
-    username: 'test-user', password: 'test-password',
+    username: 'customer-test-cc-DE-sessid-abc123', password: 'test-password',
     devices: [
       { id: '6T', mac: '02:00:00:00:00:24', ip: '192.168.1.231' },
       { id: 'OPPO', mac: '02:00:00:00:00:25', ip: '192.168.1.232' },
@@ -185,4 +186,28 @@ test('independent phone selectors retain normal split and isolate both devices',
     rule.source_ip_cidr?.[0] === '192.168.1.232/32'));
   assert.equal(profile.dns.servers.find(server => server.tag === 'dns-phone-OPPO-global').detour,
     'PHONE-SELECT-OPPO');
+  assert.deepEqual(profile.outbounds.find(outbound => outbound.tag === 'RESIDENTIAL-RELAY'), {
+    type: 'selector', tag: 'RESIDENTIAL-RELAY', outbounds: ['DIRECT', ...profile.outbounds[0].outbounds],
+    default: 'DIRECT', interrupt_exist_connections: true,
+  });
+  assert.deepEqual(profile.outbounds.find(outbound => outbound.tag === 'PHONE-RESIDENTIAL').outbounds,
+    ['RES-DE', 'RES-GB', 'RES-US', 'RES-JP', 'RES-PH']);
+  assert.deepEqual(profile.outbounds.filter(outbound => outbound.tag?.startsWith('RES-'))
+    .map(outbound => [outbound.tag, outbound.username, outbound.detour]), [
+      ['RES-DE', 'customer-test-cc-DE-sessid-abc123', 'RESIDENTIAL-RELAY'],
+      ['RES-GB', 'customer-test-cc-GB-sessid-abc123', 'RESIDENTIAL-RELAY'],
+      ['RES-US', 'customer-test-cc-US-sessid-abc123', 'RESIDENTIAL-RELAY'],
+      ['RES-JP', 'customer-test-cc-JP-sessid-abc123', 'RESIDENTIAL-RELAY'],
+      ['RES-PH', 'customer-test-cc-PH-sessid-abc123', 'RESIDENTIAL-RELAY'],
+    ]);
+  const ai = profile.outbounds.find(outbound => outbound.tag === 'AI-SERVICES');
+  assert.equal(ai.default, 'PROXY');
+  assert.ok(ai.outbounds.includes('DIRECT'));
+  const hkTag = profile.outbounds.find(outbound => outbound.tag?.includes('香港')).tag;
+  assert.ok(profile.outbounds.find(outbound => outbound.tag === 'RESIDENTIAL-RELAY').outbounds.includes(hkTag));
+  assert.ok(!ai.outbounds.includes(hkTag));
+  assert.ok(profile.route.rules.some(rule => rule.outbound === 'AI-SERVICES' &&
+    rule.domain_suffix.includes('chatgpt.com')));
+  assert.ok(profile.dns.rules.some(rule => rule.server === 'dns-ai' &&
+    rule.domain_suffix.includes('chatgpt.com')));
 });
