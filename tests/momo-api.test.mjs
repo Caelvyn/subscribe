@@ -24,6 +24,7 @@ test('feed diagnostics classify failures without logging upstream secrets', asyn
     for (const [fetchImpl, reason] of [
       [async () => ({ ok: false, status: 403 }), 'Source request failed'],
       [async () => { throw new Error('https://example.test/private-token'); }, 'Source transport error'],
+      [async () => ({ ok: true, redirected: false, text: async () => '<html><title>private-token</title>captcha</html>' }), 'Source returned HTML'],
       [async () => ({ ok: true, text: async () => 'dns:\n  nameserver: [192.0.2.53]\n  nameserver-policy: {}\nproxies: []\n' }), 'Node count dropped'],
     ]) {
       globalThis.fetch = fetchImpl;
@@ -35,6 +36,7 @@ test('feed diagnostics classify failures without logging upstream secrets', asyn
       assert.ok(!JSON.stringify(logs).includes('private-api-secret'));
     }
     assert.equal(logs[0].upstreamStatus, 403);
+    assert.deepEqual(logs[2].htmlInfo.signals, ['captcha']);
     assert.equal(logs.at(-1).nodeCounts.A, 0);
     assert.equal(logs.at(-1).nodeCounts.minimumA, 61);
   } finally {

@@ -20,6 +20,15 @@ async function fetchSubscription(url, userAgent, source) {
   });
   const body = await response.text();
   if (body.length > 4_000_000) throw new Error('Source too large');
+  if (/^\s*(?:<!doctype\s+html|<html)/i.test(body)) {
+    const signals = ['cloudflare', 'cf-chl', 'challenge-platform', 'captcha', 'javascript',
+      'just a moment', 'access denied', 'not found', '404', 'login', 'expired',
+      '验证', '登录', '过期', '失效'].filter(marker => body.toLowerCase().includes(marker));
+    throw Object.assign(new Error('Source returned HTML'), {
+      htmlInfo: { source, redirected: response.redirected === true, signals,
+        changedHost: Boolean(response.url) && new URL(response.url).host !== new URL(url).host },
+    });
+  }
   return body;
 }
 
@@ -96,7 +105,7 @@ export default async function handler(req, res) {
   } catch (error) {
     // Never log raw errors: upstream parser messages can contain credentials.
     const safeReasons = new Set([
-      'Source request failed', 'Source too large', 'A subscription format changed',
+      'Source request failed', 'Source too large', 'Source returned HTML', 'A subscription format changed',
       'B subscription format changed', 'A DNS bootstrap server missing',
       'A node resolver policy missing', 'Unsupported A node resolver',
       'Unsupported A node resolver option', 'Node count dropped', 'Duplicate node tags',
@@ -113,6 +122,7 @@ export default async function handler(req, res) {
     console.error(JSON.stringify({ event: 'momo_feed_failed', source, stage, reason, errorType, errorCode, aFormat,
       ...(Number.isInteger(error?.linePos?.[0]?.line) ? { parseLine: error.linePos[0].line } : {}),
       ...(Number.isInteger(error?.upstreamStatus) ? { upstreamStatus: error.upstreamStatus } : {}),
+      ...(error?.htmlInfo ? { htmlInfo: error.htmlInfo } : {}),
       ...(error?.nodeCounts ? { nodeCounts: error.nodeCounts } : {}),
     }));
     res.statusCode = 502;
