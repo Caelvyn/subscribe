@@ -49,11 +49,17 @@ export default async function handler(req, res) {
     return res.end('{"error":"Feed is not configured"}');
   }
   let stage = 'fetch';
+  let aFormat;
   try {
     const [aText, bText] = await Promise.all([
       source === 'B' ? '' : fetchSubscription(MOMO_SOURCE_A, 'Clash.Meta', 'A'),
       source === 'A' ? '' : fetchSubscription(MOMO_SOURCE_B, 'sing-box', 'B'),
     ]);
+    if (aText) {
+      aFormat = /^\s*(?:<!doctype\s+html|<html)/i.test(aText) ? 'html' :
+        /^\s*[{[]/.test(aText) ? 'json-like' :
+        /^proxies\s*:/m.test(aText) ? 'clash-yaml' : 'other';
+    }
     stage = 'build';
     const phone = process.env.MOMO_PHONE_MODE_ENABLED === '1' ? {
       mac: process.env.MOMO_PHONE_24G_MAC,
@@ -104,7 +110,8 @@ export default async function handler(req, res) {
       .includes(error?.name) ? error.name : 'Other';
     const errorCode = ['ERR_INVALID_URL', 'ERR_INVALID_ARG_TYPE', 'MULTIPLE_DOCS', 'DUPLICATE_KEY',
       'BAD_INDENT', 'UNEXPECTED_TOKEN', 'MISSING_CHAR'].includes(error?.code) ? error.code : undefined;
-    console.error(JSON.stringify({ event: 'momo_feed_failed', source, stage, reason, errorType, errorCode,
+    console.error(JSON.stringify({ event: 'momo_feed_failed', source, stage, reason, errorType, errorCode, aFormat,
+      ...(Number.isInteger(error?.linePos?.[0]?.line) ? { parseLine: error.linePos[0].line } : {}),
       ...(Number.isInteger(error?.upstreamStatus) ? { upstreamStatus: error.upstreamStatus } : {}),
       ...(error?.nodeCounts ? { nodeCounts: error.nodeCounts } : {}),
     }));
