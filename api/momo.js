@@ -94,12 +94,17 @@ export default async function handler(req, res) {
       'B subscription format changed', 'A DNS bootstrap server missing',
       'A node resolver policy missing', 'Unsupported A node resolver',
       'Unsupported A node resolver option', 'Node count dropped', 'Duplicate node tags',
+      'Missing A server', 'Missing A password', 'Missing A port', 'Missing API secret',
     ]);
     const reason = safeReasons.has(error?.message) ? error.message :
       error?.name === 'TimeoutError' ? 'Source timeout' :
       error?.message?.startsWith('Unsupported A protocol:') ? 'Unsupported A protocol' :
       stage === 'fetch' ? 'Source transport error' : 'Configuration validation error';
-    console.error(JSON.stringify({ event: 'momo_feed_failed', source, stage, reason,
+    const errorType = ['Error', 'TypeError', 'SyntaxError', 'YAMLParseError', 'TimeoutError']
+      .includes(error?.name) ? error.name : 'Other';
+    const errorCode = ['ERR_INVALID_URL', 'ERR_INVALID_ARG_TYPE', 'MULTIPLE_DOCS', 'DUPLICATE_KEY',
+      'BAD_INDENT', 'UNEXPECTED_TOKEN', 'MISSING_CHAR'].includes(error?.code) ? error.code : undefined;
+    console.error(JSON.stringify({ event: 'momo_feed_failed', source, stage, reason, errorType, errorCode,
       ...(Number.isInteger(error?.upstreamStatus) ? { upstreamStatus: error.upstreamStatus } : {}),
       ...(error?.nodeCounts ? { nodeCounts: error.nodeCounts } : {}),
     }));
