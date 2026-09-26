@@ -10,12 +10,14 @@ function tokenMatches(provided, expected) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
-async function fetchSubscription(url, userAgent) {
+async function fetchSubscription(url, userAgent, source) {
   const response = await fetch(url, {
     headers: { 'User-Agent': userAgent },
     signal: AbortSignal.timeout(20000),
   });
-  if (!response.ok) throw new Error('Source request failed');
+  if (!response.ok) throw Object.assign(new Error('Source request failed'), {
+    feedSource: source, upstreamStatus: response.status,
+  });
   const body = await response.text();
   if (body.length > 4_000_000) throw new Error('Source too large');
   return body;
@@ -46,11 +48,13 @@ export default async function handler(req, res) {
     res.statusCode = 503;
     return res.end('{"error":"Feed is not configured"}');
   }
+  let stage = 'fetch';
   try {
     const [aText, bText] = await Promise.all([
-      source === 'B' ? '' : fetchSubscription(MOMO_SOURCE_A, 'Clash.Meta'),
-      source === 'A' ? '' : fetchSubscription(MOMO_SOURCE_B, 'sing-box'),
+      source === 'B' ? '' : fetchSubscription(MOMO_SOURCE_A, 'Clash.Meta', 'A'),
+      source === 'A' ? '' : fetchSubscription(MOMO_SOURCE_B, 'sing-box', 'B'),
     ]);
+    stage = 'build';
     const phone = process.env.MOMO_PHONE_MODE_ENABLED === '1' ? {
       mac: process.env.MOMO_PHONE_24G_MAC,
       ip: process.env.MOMO_PHONE_24G_IP,
@@ -83,7 +87,22 @@ export default async function handler(req, res) {
     );
     res.statusCode = 200;
     return res.end(JSON.stringify(profile));
-  } catch {
+  } catch (error) {
+    // Never log raw errors: upstream parser messages can contain credentials.
+    const safeReasons = new Set([
+      'Source request failed', 'Source too large', 'A subscription format changed',
+      'B subscription format changed', 'A DNS bootstrap server missing',
+      'A node resolver policy missing', 'Unsupported A node resolver',
+      'Unsupported A node resolver option', 'Node count dropped', 'Duplicate node tags',
+    ]);
+    const reason = safeReasons.has(error?.message) ? error.message :
+      error?.name === 'TimeoutError' ? 'Source timeout' :
+      error?.message?.startsWith('Unsupported A protocol:') ? 'Unsupported A protocol' :
+      stage === 'fetch' ? 'Source transport error' : 'Configuration validation error';
+    console.error(JSON.stringify({ event: 'momo_feed_failed', source, stage, reason,
+      ...(Number.isInteger(error?.upstreamStatus) ? { upstreamStatus: error.upstreamStatus } : {}),
+      ...(error?.nodeCounts ? { nodeCounts: error.nodeCounts } : {}),
+    }));
     res.statusCode = 502;
     return res.end('{"error":"Unable to build a complete configuration"}');
   }

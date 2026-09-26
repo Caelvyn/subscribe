@@ -12,6 +12,41 @@ const originalEnv = Object.fromEntries(
     .map(name => [name, process.env[name]]),
 );
 
+test('feed diagnostics classify failures without logging upstream secrets', async () => {
+  const oldError = console.error;
+  const logs = [];
+  console.error = message => logs.push(JSON.parse(message));
+  Object.assign(process.env, {
+    MOMO_SOURCE_A: 'https://example.test/private-token', MOMO_API_SECRET: 'private-api-secret',
+    MOMO_FEED_TOKEN: 'a'.repeat(24), MOMO_MIN_A: '61', MOMO_PHONE_MODE_ENABLED: '0',
+  });
+  try {
+    for (const [fetchImpl, reason] of [
+      [async () => ({ ok: false, status: 403 }), 'Source request failed'],
+      [async () => { throw new Error('https://example.test/private-token'); }, 'Source transport error'],
+      [async () => ({ ok: true, text: async () => 'dns:\n  nameserver: [192.0.2.53]\n  nameserver-policy: {}\nproxies: []\n' }), 'Node count dropped'],
+    ]) {
+      globalThis.fetch = fetchImpl;
+      const response = { setHeader() {}, end(body) { this.body = body; } };
+      await handler({ method: 'GET', url: `/api/momo?source=A&key=${'a'.repeat(24)}` }, response);
+      assert.equal(response.statusCode, 502);
+      assert.equal(logs.at(-1).reason, reason);
+      assert.ok(!JSON.stringify(logs).includes('private-token'));
+      assert.ok(!JSON.stringify(logs).includes('private-api-secret'));
+    }
+    assert.equal(logs[0].upstreamStatus, 403);
+    assert.equal(logs.at(-1).nodeCounts.A, 0);
+    assert.equal(logs.at(-1).nodeCounts.minimumA, 61);
+  } finally {
+    console.error = oldError;
+    globalThis.fetch = originalFetch;
+    for (const [name, value] of Object.entries(originalEnv)) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
+  }
+});
+
 test('Momo feed requests only the selected source with its required UA', async () => {
   Object.assign(process.env, {
     MOMO_SOURCE_A: 'https://example.test/a',

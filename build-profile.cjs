@@ -253,7 +253,9 @@ function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, so
   }
   if ((source !== 'B' && aNodes.length < minimumA) ||
       (source !== 'A' && bNodes.length < minimumB)) {
-    throw new Error('Node count dropped');
+    throw Object.assign(new Error('Node count dropped'), {
+      nodeCounts: { A: aNodes.length, B: bNodes.length, minimumA, minimumB },
+    });
   }
   const nodeTags = [...aNodes, ...bNodes].map(outbound => outbound.tag);
   if (new Set(nodeTags).size !== nodeTags.length) throw new Error('Duplicate node tags');
