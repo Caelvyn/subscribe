@@ -197,7 +197,7 @@ test('independent phone selectors retain normal split and isolate both devices',
     independent: true, server: 'proxy.example.test', port: '7777',
     username: 'customer-test-cc-DE-city-berlin-sessid-abc123', password: 'test-password',
     devices: [
-      { id: '6T', mac: '02:00:00:00:00:24' },
+      { id: '6T', mac: '02:00:00:00:00:24, 02:00:00:00:00:34' },
       { id: 'OPPO', mac: '02:00:00:00:00:25' },
     ],
   });
@@ -216,7 +216,7 @@ test('independent phone selectors retain normal split and isolate both devices',
     ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO']);
   assert.ok(phoneRoutes.every(rule => !rule.source_ip_cidr));
   assert.deepEqual(phoneRoutes.map(rule => rule.source_mac_address),
-    [['02:00:00:00:00:24'], ['02:00:00:00:00:25']]);
+    [['02:00:00:00:00:24', '02:00:00:00:00:34'], ['02:00:00:00:00:25']]);
   assert.ok(profile.route.rules.indexOf(phoneRoutes[0]) <
     profile.route.rules.findIndex(rule => rule.rule_set === 'ads'));
   assert.equal(profile.route.final, 'PROXY');

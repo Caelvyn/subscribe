@@ -154,14 +154,21 @@ function addIndependentPhoneModes(profile, phone) {
   }
   const ids = new Set();
   const addresses = new Set();
-  for (const { id, mac } of devices) {
+  const deviceMatches = devices.map(device => ({
+    ...device,
+    macs: (Array.isArray(device.macs) ? device.macs : String(device.mac || '').split(/[\s,]+/))
+      .filter(Boolean).map(mac => String(mac).toLowerCase()),
+  }));
+  for (const { id, macs } of deviceMatches) {
     if (!/^[A-Za-z0-9-]+$/.test(id) || ids.has(id)) throw new Error('Invalid or duplicate phone id');
-    if (typeof mac !== 'string' || !/^([0-9a-f]{2}:){5}[0-9a-f]{2}$/i.test(mac)) {
+    if (!macs.length || macs.some(mac => !/^([0-9a-f]{2}:){5}[0-9a-f]{2}$/i.test(mac))) {
       throw new Error('Invalid phone address');
     }
-    if (addresses.has(mac.toLowerCase())) throw new Error('Duplicate phone address');
     ids.add(id);
-    addresses.add(mac.toLowerCase());
+    for (const mac of macs) {
+      if (addresses.has(mac)) throw new Error('Duplicate phone address');
+      addresses.add(mac);
+    }
   }
 
   const cities = { DE: 'berlin', GB: 'london', US: 'new_york', JP: 'tokyo', PH: 'manila' };
@@ -197,13 +204,13 @@ function addIndependentPhoneModes(profile, phone) {
 
   const routeRules = [];
   const dnsRules = [];
-  for (const { id, mac } of devices) {
+  for (const { id, macs } of deviceMatches) {
     const selector = `PHONE-SELECT-${id}`;
     const residential = `PHONE-RESIDENTIAL-${id}`;
     const cnDns = `dns-phone-${id}-cn`;
     const globalDns = `dns-phone-${id}-global`;
     const matches = [
-      { source_mac_address: [mac.toLowerCase()] },
+      { source_mac_address: macs },
     ];
     profile.outbounds.push({
       type: 'selector', tag: residential, outbounds: [...countryTags],
