@@ -369,5 +369,19 @@ test('independent phone selectors retain normal split and isolate both devices',
       for (const child of [...(node.outbounds || []), ...(node.detour ? [node.detour] : [])]) walk(child, next);
     };
     for (const tag of nodes.keys()) walk(tag);
+    const claudeRules = variantProfile.route.rules.filter(rule => rule.domain_suffix?.includes('claude.ai'));
+    assert.equal(claudeRules[0].action, 'reject');
+    assert.equal(claudeRules[0].network, 'udp');
+    assert.ok(variantProfile.route.rules.indexOf(claudeRules.at(-1)) <
+      variantProfile.route.rules.findIndex(rule => rule.source_mac_address && !rule.domain_suffix));
+    for (const rule of claudeRules.filter(rule => rule.outbound)) {
+      const fixed = nodes.get(rule.outbound);
+      assert.equal(fixed.type, 'socks');
+      assert.ok(fixed.username.includes('-cc-DE-city-berlin-'));
+      assert.ok(!fixed.outbounds);
+    }
+    const claudeDns = variantProfile.dns.servers.filter(server => server.tag.startsWith('dns-claude-'));
+    assert.equal(claudeDns.length, variantProfile === simple ? 1 : 3);
+    assert.ok(claudeDns.every(server => nodes.get(server.detour)?.username.includes('-cc-DE-')));
   }
 });

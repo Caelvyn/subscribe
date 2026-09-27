@@ -30,6 +30,32 @@ function applyVariant(profile, variant = 'full', source = 'AB') {
     }
   }
   profile.outbounds = profile.outbounds.filter(node => !removed.has(node.tag));
+  // Claude is a fixed Germany exception, not another user-selectable group.
+  // Place it before device mode/country routing, including their DIRECT option.
+  const germany = 'PROXY-RES-DE-Berlin';
+  if (profile.outbounds.some(node => node.tag === germany)) {
+    const domains = ['claude.ai', 'claude.com', 'anthropic.com', 'claudeusercontent.com'];
+    const matches = [];
+    if (variant === 'full') {
+      for (const country of countries) {
+        const id = country.tag.slice('PHONE-RESIDENTIAL-'.length);
+        const phoneRule = profile.route.rules.find(rule => rule.outbound === `PHONE-SELECT-${id}`);
+        matches.push({ match: { source_mac_address: [...phoneRule.source_mac_address] },
+          outbound: `${id}-RES-DE-Berlin`, dns: `dns-claude-${id}` });
+      }
+    }
+    matches.push({ match: {}, outbound: germany, dns: 'dns-claude-de' });
+    profile.route.rules.splice(3, 0,
+      { domain_suffix: domains, network: 'udp', action: 'reject' },
+      ...matches.map(({ match, outbound }) => ({ ...match, domain_suffix: domains, action: 'route', outbound })),
+    );
+    profile.dns.servers.push(...matches.map(({ outbound, dns }) => ({
+      type: 'https', tag: dns, server: '1.1.1.1', detour: outbound,
+    })));
+    profile.dns.rules.unshift(...matches.map(({ match, dns }) => ({
+      ...match, domain_suffix: domains, action: 'route', server: dns, strategy: 'prefer_ipv4',
+    })));
+  }
   // Keep selections independent when switching airport or layout.
   profile.experimental.cache_file.cache_id = `momo-${source.toLowerCase()}-${variant}`;
   return profile;
