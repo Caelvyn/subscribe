@@ -29,15 +29,6 @@ function applyVariant(profile, variant = 'full', source = 'AB') {
       }
     }
   }
-  if (variant === 'simple') {
-    removed.add('AI-SERVICES');
-    for (const rule of profile.route.rules) {
-      if (rule.outbound === 'AI-SERVICES') rule.outbound = 'PROXY';
-    }
-    for (const server of profile.dns.servers) {
-      if (server.detour === 'AI-SERVICES') server.detour = 'PROXY';
-    }
-  }
   profile.outbounds = profile.outbounds.filter(node => !removed.has(node.tag));
   // Keep selections independent when switching airport or layout.
   profile.experimental.cache_file.cache_id = `momo-${source.toLowerCase()}-${variant}`;

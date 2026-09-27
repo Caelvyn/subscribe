@@ -291,8 +291,7 @@ function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, so
   profile.experimental.clash_api.secret = need(apiSecret, 'API secret');
   const aiDomains = [
     'chatgpt.com', 'openai.com', 'oaistatic.com', 'oaiusercontent.com',
-    'oaistatsig.com', 'claude.ai', 'anthropic.com', 'gemini.google.com',
-    'generativelanguage.googleapis.com',
+    'oaistatsig.com',
   ];
   profile.outbounds.push({
     type: 'selector', tag: 'AI-SERVICES',

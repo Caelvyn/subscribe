@@ -349,13 +349,16 @@ test('independent phone selectors retain normal split and isolate both devices',
   }
   assert.deepEqual(simple.outbounds.filter(node => node.type === 'selector').map(node => node.tag), [
     '01 总代理', '02 总代理 · 住宅国家', '03 总住宅中转',
-    '04 一加 6T · 上网模式', '05 OPPO A96 · 上网模式',
+    '04 一加 6T · 上网模式', '05 OPPO A96 · 上网模式', '06 ChatGPT',
   ]);
   assert.ok(simple.outbounds.filter(node => node.tag.endsWith('上网模式')).every(node =>
     JSON.stringify(node.outbounds) === JSON.stringify(['正常分流（国内直连·国外代理）', '02 总代理 · 住宅国家', '直连'])));
   assert.equal(simple.outbounds.filter(node => node.detour === '03 总住宅中转').length, 5);
-  assert.equal(simple.route.rules.find(rule => rule.domain_suffix?.includes('chatgpt.com')).outbound, '01 总代理');
-  assert.equal(simple.dns.servers.find(server => server.tag === 'dns-ai').detour, '01 总代理');
+  const chatgptRule = simple.route.rules.find(rule => rule.domain_suffix?.includes('chatgpt.com'));
+  assert.equal(chatgptRule.outbound, '06 ChatGPT');
+  assert.ok(['claude.ai', 'anthropic.com', 'gemini.google.com', 'generativelanguage.googleapis.com']
+    .every(domain => !chatgptRule.domain_suffix.includes(domain)));
+  assert.equal(simple.dns.servers.find(server => server.tag === 'dns-ai').detour, '06 ChatGPT');
   assert.notEqual(simple.experimental.cache_file.cache_id, profile.experimental.cache_file.cache_id);
   for (const variantProfile of [profile, simple]) {
     const nodes = new Map(variantProfile.outbounds.map(node => [node.tag, node]));

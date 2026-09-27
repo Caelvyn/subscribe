@@ -10,7 +10,7 @@ const labels = {
   'PHONE-SELECT-OPPO': '07 OPPO A96 · 上网模式',
   'PHONE-RESIDENTIAL-OPPO': '08 OPPO A96 · 住宅国家',
   'PHONE-RELAY-OPPO': '09 OPPO A96 · 住宅中转',
-  'AI-SERVICES': '10 ChatGPT 等 AI 服务',
+  'AI-SERVICES': '10 ChatGPT',
   'RESIDENTIAL-RELAY': '08 两台手机 · 共用住宅中转',
   'PHONE-NORMAL': '正常分流（国内直连·国外代理）',
   'PHONE-RESIDENTIAL': '手机住宅出口',
@@ -33,6 +33,7 @@ const simpleLabels = {
   'PROXY-RESIDENTIAL': '02 总代理 · 住宅国家',
   'PROXY-RESIDENTIAL-RELAY': '03 总住宅中转',
   'PHONE-SELECT-OPPO': '05 OPPO A96 · 上网模式',
+  'AI-SERVICES': '06 ChatGPT',
 };
 for (const tag of Object.keys(simpleLabels).filter(tag => tag.startsWith('PROXY-RES-'))) {
   simpleLabels[tag] = simpleLabels[tag].replace('（普通住宅）', '（共用住宅）');
@@ -52,7 +53,7 @@ function formatProfile(profile, variant = 'full') {
   };
   rename(profile);
   const order = (variant === 'simple' ? ['PROXY', 'PROXY-RESIDENTIAL',
-    'PROXY-RESIDENTIAL-RELAY', 'PHONE-SELECT-6T', 'PHONE-SELECT-OPPO'] : selectorOrder).map(display);
+    'PROXY-RESIDENTIAL-RELAY', 'PHONE-SELECT-6T', 'PHONE-SELECT-OPPO', 'AI-SERVICES'] : selectorOrder).map(display);
   const rank = outbound => {
     const index = order.indexOf(outbound.tag);
     return index >= 0 ? index : outbound.type === 'selector' ? order.length : order.length + 1;
