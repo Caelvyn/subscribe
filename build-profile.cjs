@@ -154,15 +154,14 @@ function addIndependentPhoneModes(profile, phone) {
   }
   const ids = new Set();
   const addresses = new Set();
-  for (const { id, mac, ip } of devices) {
+  for (const { id, mac } of devices) {
     if (!/^[A-Za-z0-9-]+$/.test(id) || ids.has(id)) throw new Error('Invalid or duplicate phone id');
-    if (!/^([0-9a-f]{2}:){5}[0-9a-f]{2}$/i.test(mac) || net.isIP(ip) !== 4) {
+    if (typeof mac !== 'string' || !/^([0-9a-f]{2}:){5}[0-9a-f]{2}$/i.test(mac)) {
       throw new Error('Invalid phone address');
     }
-    if (addresses.has(mac.toLowerCase()) || addresses.has(ip)) throw new Error('Duplicate phone address');
+    if (addresses.has(mac.toLowerCase())) throw new Error('Duplicate phone address');
     ids.add(id);
     addresses.add(mac.toLowerCase());
-    addresses.add(ip);
   }
 
   const cities = { DE: 'berlin', GB: 'london', US: 'new_york', JP: 'tokyo', PH: 'manila' };
@@ -173,14 +172,10 @@ function addIndependentPhoneModes(profile, phone) {
   }
   const relayTags = profile.outbounds[0].outbounds;
   profile.outbounds.push({
-    type: 'selector', tag: 'RESIDENTIAL-RELAY', outbounds: ['DIRECT', ...relayTags],
+    type: 'selector', tag: 'RESIDENTIAL-RELAY', outbounds: [...new Set(['DIRECT', ...relayTags])],
     default: 'DIRECT', interrupt_exist_connections: true,
   });
   const countryTags = countryCodes.map(code => `RES-${code}-${cityLabels[code]}`);
-  profile.outbounds.push({
-    type: 'selector', tag: 'PHONE-RESIDENTIAL', outbounds: countryTags,
-    default: countryTags[0], interrupt_exist_connections: true,
-  });
   for (const code of countryCodes) {
     let countryUsername = username.replace(/-cc-[a-z]{2}(?:-city-[a-z0-9_]+)?(?=-|$)/i,
       `-cc-${code}-city-${cities[code]}`);
@@ -202,17 +197,20 @@ function addIndependentPhoneModes(profile, phone) {
 
   const routeRules = [];
   const dnsRules = [];
-  for (const { id, mac, ip } of devices) {
+  for (const { id, mac } of devices) {
     const selector = `PHONE-SELECT-${id}`;
+    const residential = `PHONE-RESIDENTIAL-${id}`;
     const cnDns = `dns-phone-${id}-cn`;
     const globalDns = `dns-phone-${id}-global`;
     const matches = [
       { source_mac_address: [mac.toLowerCase()] },
-      { source_ip_cidr: [`${ip}/32`] },
     ];
     profile.outbounds.push({
+      type: 'selector', tag: residential, outbounds: [...countryTags],
+      default: countryTags[0], interrupt_exist_connections: true,
+    }, {
       type: 'selector', tag: selector,
-      outbounds: ['PHONE-NORMAL', 'PHONE-RESIDENTIAL', 'DIRECT'],
+      outbounds: ['PHONE-NORMAL', residential, 'DIRECT'],
       default: 'PHONE-NORMAL', interrupt_exist_connections: true,
     });
     profile.dns.servers.push(
@@ -232,6 +230,23 @@ function addIndependentPhoneModes(profile, phone) {
   // outbound. Its source is 127.0.0.1, so it follows the regular rules below.
   profile.route.rules.splice(5, 0, ...routeRules);
   profile.dns.rules.splice(3, 0, ...dnsRules);
+
+  // The ordinary proxy group has its own country and relay selection. Only
+  // concrete airport nodes and DIRECT may be relays, preventing selector loops.
+  const generalCountryTags = countryTags.map(tag => `PROXY-${tag}`);
+  profile.outbounds.push({
+    type: 'selector', tag: 'PROXY-RESIDENTIAL-RELAY',
+    outbounds: [...new Set(['DIRECT', ...relayTags])],
+    default: 'DIRECT', interrupt_exist_connections: true,
+  }, {
+    type: 'selector', tag: 'PROXY-RESIDENTIAL', outbounds: generalCountryTags,
+    default: generalCountryTags[0], interrupt_exist_connections: true,
+  });
+  for (const tag of countryTags) {
+    const node = profile.outbounds.find(outbound => outbound.tag === tag);
+    profile.outbounds.push({ ...node, tag: `PROXY-${tag}`, detour: 'PROXY-RESIDENTIAL-RELAY' });
+  }
+  profile.outbounds[0].outbounds = [...relayTags, 'PROXY-RESIDENTIAL'];
 }
 
 function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, source = 'AB', wanInterface = 'pppoe-wan', phone) {
@@ -263,7 +278,7 @@ function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, so
   const profile = structuredClone(template);
   if (source === 'A') profile.dns.strategy = 'prefer_ipv4';
   profile.dns.servers.push(...aDnsServers);
-  profile.outbounds[0].outbounds = nodeTags;
+  profile.outbounds[0].outbounds = [...nodeTags, 'DIRECT'];
   profile.outbounds[0].default = nodeTags[0];
   profile.outbounds.push(...aNodes, ...bNodes);
   profile.experimental.clash_api.secret = need(apiSecret, 'API secret');

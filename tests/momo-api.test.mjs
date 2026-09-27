@@ -197,38 +197,66 @@ test('independent phone selectors retain normal split and isolate both devices',
     independent: true, server: 'proxy.example.test', port: '7777',
     username: 'customer-test-cc-DE-city-berlin-sessid-abc123', password: 'test-password',
     devices: [
-      { id: '6T', mac: '02:00:00:00:00:24', ip: '192.168.1.231' },
-      { id: 'OPPO', mac: '02:00:00:00:00:25', ip: '192.168.1.232' },
+      { id: '6T', mac: '02:00:00:00:00:24' },
+      { id: 'OPPO', mac: '02:00:00:00:00:25' },
     ],
   });
   const selectors = profile.outbounds.filter(outbound => outbound.tag?.startsWith('PHONE-SELECT-'));
   assert.deepEqual(selectors.map(outbound => outbound.tag), ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO']);
   assert.ok(selectors.every(outbound => outbound.default === 'PHONE-NORMAL' &&
     outbound.interrupt_exist_connections === true &&
-    JSON.stringify(outbound.outbounds) === JSON.stringify(['PHONE-NORMAL', 'PHONE-RESIDENTIAL', 'DIRECT'])));
+    JSON.stringify(outbound.outbounds) === JSON.stringify(['PHONE-NORMAL',
+      outbound.tag.replace('PHONE-SELECT-', 'PHONE-RESIDENTIAL-'), 'DIRECT'])));
   assert.deepEqual(profile.inbounds.find(inbound => inbound.tag === 'phone-normal-in'),
     { type: 'socks', tag: 'phone-normal-in', listen: '127.0.0.1', listen_port: 10556 });
   assert.deepEqual(profile.outbounds.find(outbound => outbound.tag === 'PHONE-NORMAL'),
     { type: 'socks', tag: 'PHONE-NORMAL', server: '127.0.0.1', server_port: 10556, version: '5' });
   const phoneRoutes = profile.route.rules.filter(rule => rule.outbound?.startsWith('PHONE-SELECT-'));
   assert.deepEqual(phoneRoutes.map(rule => rule.outbound),
-    ['PHONE-SELECT-6T', 'PHONE-SELECT-6T', 'PHONE-SELECT-OPPO', 'PHONE-SELECT-OPPO']);
+    ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO']);
+  assert.ok(phoneRoutes.every(rule => !rule.source_ip_cidr));
+  assert.deepEqual(phoneRoutes.map(rule => rule.source_mac_address),
+    [['02:00:00:00:00:24'], ['02:00:00:00:00:25']]);
   assert.ok(profile.route.rules.indexOf(phoneRoutes[0]) <
     profile.route.rules.findIndex(rule => rule.rule_set === 'ads'));
   assert.equal(profile.route.final, 'PROXY');
   const oppoDns = profile.dns.rules.filter(rule => rule.server?.startsWith('dns-phone-OPPO-'));
   assert.deepEqual(oppoDns.map(rule => rule.server),
-    ['dns-phone-OPPO-cn', 'dns-phone-OPPO-global', 'dns-phone-OPPO-cn', 'dns-phone-OPPO-global']);
-  assert.ok(oppoDns.every(rule => rule.source_mac_address?.[0] === '02:00:00:00:00:25' ||
-    rule.source_ip_cidr?.[0] === '192.168.1.232/32'));
+    ['dns-phone-OPPO-cn', 'dns-phone-OPPO-global']);
+  assert.ok(oppoDns.every(rule => rule.source_mac_address?.[0] === '02:00:00:00:00:25' &&
+    !rule.source_ip_cidr));
   assert.equal(profile.dns.servers.find(server => server.tag === 'dns-phone-OPPO-global').detour,
     'PHONE-SELECT-OPPO');
   assert.deepEqual(profile.outbounds.find(outbound => outbound.tag === 'RESIDENTIAL-RELAY'), {
-    type: 'selector', tag: 'RESIDENTIAL-RELAY', outbounds: ['DIRECT', ...profile.outbounds[0].outbounds],
+    type: 'selector', tag: 'RESIDENTIAL-RELAY', outbounds: ['DIRECT',
+      ...profile.outbounds.filter(outbound => outbound.tag.startsWith('B ')).map(outbound => outbound.tag)],
     default: 'DIRECT', interrupt_exist_connections: true,
   });
-  assert.deepEqual(profile.outbounds.find(outbound => outbound.tag === 'PHONE-RESIDENTIAL').outbounds,
+  const countryGroups = ['6T', 'OPPO'].map(id =>
+    profile.outbounds.find(outbound => outbound.tag === `PHONE-RESIDENTIAL-${id}`));
+  for (const group of countryGroups) assert.deepEqual(group.outbounds,
     ['RES-DE-Berlin', 'RES-GB-London', 'RES-US-NewYork', 'RES-JP-Tokyo', 'RES-PH-Manila']);
+  assert.notEqual(countryGroups[0].tag, countryGroups[1].tag);
+  assert.ok(!profile.outbounds.some(outbound => outbound.tag === 'PHONE-RESIDENTIAL'));
+  assert.equal(profile.outbounds[0].outbounds.filter(tag => tag === 'DIRECT').length, 1);
+  assert.notEqual(profile.outbounds[0].default, 'DIRECT');
+  assert.ok(profile.outbounds[0].outbounds.includes('PROXY-RESIDENTIAL'));
+  const generalCountry = profile.outbounds.find(outbound => outbound.tag === 'PROXY-RESIDENTIAL');
+  const generalRelay = profile.outbounds.find(outbound => outbound.tag === 'PROXY-RESIDENTIAL-RELAY');
+  assert.deepEqual(generalCountry.outbounds, countryGroups[0].outbounds.map(tag => `PROXY-${tag}`));
+  assert.deepEqual(generalRelay.outbounds,
+    profile.outbounds.find(outbound => outbound.tag === 'RESIDENTIAL-RELAY').outbounds);
+  assert.ok(generalCountry.outbounds.every(tag => profile.outbounds.find(outbound => outbound.tag === tag)
+    .detour === generalRelay.tag));
+  const byTag = new Map(profile.outbounds.map(outbound => [outbound.tag, outbound]));
+  const visit = (tag, path = new Set()) => {
+    assert.ok(!path.has(tag), `Outbound cycle at ${tag}`);
+    assert.ok(byTag.has(tag), `Missing outbound ${tag}`);
+    const node = byTag.get(tag);
+    const next = new Set([...path, tag]);
+    for (const child of [...(node.outbounds || []), ...(node.detour ? [node.detour] : [])]) visit(child, next);
+  };
+  for (const tag of byTag.keys()) visit(tag);
   assert.deepEqual(profile.outbounds.filter(outbound => outbound.tag?.startsWith('RES-'))
     .map(outbound => [outbound.tag, outbound.username, outbound.detour]), [
       ['RES-DE-Berlin', 'customer-test-cc-DE-city-berlin-sessid-abc123', 'RESIDENTIAL-RELAY'],
