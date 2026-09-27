@@ -12,7 +12,7 @@ const labels = {
   'PHONE-RELAY-OPPO': '09 OPPO A96 · 住宅中转',
   'AI-SERVICES': '10 ChatGPT',
   'RESIDENTIAL-RELAY': '08 两台手机 · 共用住宅中转',
-  'PHONE-NORMAL': '正常分流（国内直连·国外代理）',
+  'PHONE-NORMAL': '正常分流',
   'PHONE-RESIDENTIAL': '手机住宅出口',
   DIRECT: '直连',
 };

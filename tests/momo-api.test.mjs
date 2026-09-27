@@ -358,7 +358,7 @@ test('independent phone selectors retain normal split and isolate both devices',
     '04 总代理 · 住宅国家', '05 总住宅中转', '06 ChatGPT',
   ]);
   assert.ok(simple.outbounds.filter(node => node.tag.endsWith('上网模式')).every(node =>
-    JSON.stringify(node.outbounds) === JSON.stringify(['正常分流（国内直连·国外代理）', '04 总代理 · 住宅国家', '直连'])));
+    JSON.stringify(node.outbounds) === JSON.stringify(['正常分流', '04 总代理 · 住宅国家', '直连'])));
   assert.equal(simple.outbounds.filter(node => node.detour === '05 总住宅中转').length, 5);
   const chatgptRule = simple.route.rules.find(rule => rule.domain_suffix?.includes('chatgpt.com'));
   assert.equal(chatgptRule.outbound, '06 ChatGPT');
