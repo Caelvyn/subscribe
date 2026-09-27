@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import handler from '../api/momo.js';
 import profileBuilder from '../build-profile.cjs';
+import profileLabels from '../profile-labels.cjs';
 
 const originalFetch = globalThis.fetch;
 const originalEnv = Object.fromEntries(
@@ -152,7 +153,7 @@ test('Momo feed requests only the selected source with its required UA', async (
     const enabledResponse = { headers: {}, setHeader(k, v) { this.headers[k] = v; }, end(body) { this.body = body; } };
     await handler({ method: 'GET', url: `/api/momo?source=B&key=${'a'.repeat(24)}` }, enabledResponse);
     assert.equal(enabledResponse.statusCode, 200);
-    assert.ok(JSON.parse(enabledResponse.body).outbounds.some(outbound => outbound.tag === 'PHONE-RESIDENTIAL'));
+    assert.ok(JSON.parse(enabledResponse.body).outbounds.some(outbound => outbound.tag === profileLabels.labelFor('PHONE-RESIDENTIAL')));
     process.env.MOMO_INDEPENDENT_PHONE_MODES = '1';
     process.env.MOMO_OPPO_MAC = '02:00:00:00:00:25';
     process.env.MOMO_OPPO_IP = '192.168.1.232';
@@ -160,8 +161,8 @@ test('Momo feed requests only the selected source with its required UA', async (
     await handler({ method: 'GET', url: `/api/momo?source=B&key=${'a'.repeat(24)}` }, independentResponse);
     assert.equal(independentResponse.statusCode, 200);
     assert.deepEqual(JSON.parse(independentResponse.body).outbounds
-      .filter(outbound => outbound.tag?.startsWith('PHONE-SELECT-')).map(outbound => outbound.tag),
-    ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO']);
+      .filter(outbound => outbound.tag?.includes('上网模式')).map(outbound => outbound.tag),
+    ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO'].map(profileLabels.labelFor));
     process.env.MOMO_EXTRA_PHONES_JSON = JSON.stringify([
       { id: 'OTHER', mac: '02:00:00:00:00:26', ip: '192.168.1.233' },
     ]);
@@ -169,8 +170,8 @@ test('Momo feed requests only the selected source with its required UA', async (
     await handler({ method: 'GET', url: `/api/momo?source=B&key=${'a'.repeat(24)}` }, extraResponse);
     assert.equal(extraResponse.statusCode, 200);
     assert.deepEqual(JSON.parse(extraResponse.body).outbounds
-      .filter(outbound => outbound.tag?.startsWith('PHONE-SELECT-')).map(outbound => outbound.tag),
-    ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO', 'PHONE-SELECT-OTHER']);
+      .filter(outbound => outbound.tag?.includes('上网模式') || outbound.tag === 'PHONE-SELECT-OTHER').map(outbound => outbound.tag),
+    ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO', 'PHONE-SELECT-OTHER'].map(profileLabels.labelFor));
   } finally {
     globalThis.fetch = originalFetch;
     for (const [name, value] of Object.entries(originalEnv)) {
@@ -306,4 +307,30 @@ test('independent phone selectors retain normal split and isolate both devices',
     rule.domain_suffix.includes('chatgpt.com')));
   assert.ok(profile.dns.rules.some(rule => rule.server === 'dns-ai' &&
     rule.domain_suffix.includes('chatgpt.com')));
+
+  profileLabels.formatProfile(profile);
+  assert.deepEqual(profile.outbounds.filter(outbound => outbound.type === 'selector')
+    .map(outbound => outbound.tag), Object.values(profileLabels.labels).slice(0, 9));
+  const renamedTags = new Set(profile.outbounds.map(outbound => outbound.tag));
+  assert.equal(renamedTags.size, profile.outbounds.length);
+  const checkReferences = value => {
+    if (!value || typeof value !== 'object') return;
+    for (const [key, child] of Object.entries(value)) {
+      if (['outbound', 'detour', 'download_detour'].includes(key) && typeof child === 'string') {
+        assert.ok(renamedTags.has(child), `Missing reference ${child}`);
+      }
+      if (Array.isArray(child)) child.forEach(checkReferences);
+      else checkReferences(child);
+    }
+  };
+  checkReferences(profile);
+  for (const outbound of profile.outbounds) {
+    for (const tag of outbound.outbounds || []) assert.ok(renamedTags.has(tag));
+    if (outbound.default) assert.ok(outbound.outbounds.includes(outbound.default));
+  }
+  assert.ok(renamedTags.has(profile.route.final));
+  assert.deepEqual(profile.outbounds[0].outbounds.slice(0, 2),
+    ['直连', '02 普通代理 · 住宅国家']);
+  assert.equal(profile.outbounds.find(outbound => outbound.tag === '德国 · 柏林（手机住宅）').username,
+    'customer-test-cc-DE-city-berlin-sessid-abc123');
 });

@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import profileBuilder from '../build-profile.cjs';
+import profileLabels from '../profile-labels.cjs';
 
 const { buildProfile } = profileBuilder;
 
@@ -115,7 +116,7 @@ export default async function handler(req, res) {
       phone,
     );
     res.statusCode = 200;
-    return res.end(JSON.stringify(profile));
+    return res.end(JSON.stringify(profileLabels.formatProfile(profile)));
   } catch (error) {
     // Never log raw errors: upstream parser messages can contain credentials.
     const safeReasons = new Set([
