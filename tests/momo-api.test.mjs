@@ -354,12 +354,12 @@ test('independent phone selectors retain normal split and isolate both devices',
     assert.ok(country.outbounds.every(tag => tag.includes(title)));
   }
   assert.deepEqual(simple.outbounds.filter(node => node.type === 'selector').map(node => node.tag), [
-    '01 总代理', '02 总代理 · 住宅国家', '03 总住宅中转',
-    '04 一加 6T · 上网模式', '05 OPPO A96 · 上网模式', '06 ChatGPT',
+    '01 总代理', '02 一加 6T · 上网模式', '03 OPPO A96 · 上网模式',
+    '04 总代理 · 住宅国家', '05 总住宅中转', '06 ChatGPT',
   ]);
   assert.ok(simple.outbounds.filter(node => node.tag.endsWith('上网模式')).every(node =>
-    JSON.stringify(node.outbounds) === JSON.stringify(['正常分流（国内直连·国外代理）', '02 总代理 · 住宅国家', '直连'])));
-  assert.equal(simple.outbounds.filter(node => node.detour === '03 总住宅中转').length, 5);
+    JSON.stringify(node.outbounds) === JSON.stringify(['正常分流（国内直连·国外代理）', '04 总代理 · 住宅国家', '直连'])));
+  assert.equal(simple.outbounds.filter(node => node.detour === '05 总住宅中转').length, 5);
   const chatgptRule = simple.route.rules.find(rule => rule.domain_suffix?.includes('chatgpt.com'));
   assert.equal(chatgptRule.outbound, '06 ChatGPT');
   assert.ok(['claude.ai', 'anthropic.com', 'gemini.google.com', 'generativelanguage.googleapis.com']
@@ -375,19 +375,10 @@ test('independent phone selectors retain normal split and isolate both devices',
       for (const child of [...(node.outbounds || []), ...(node.detour ? [node.detour] : [])]) walk(child, next);
     };
     for (const tag of nodes.keys()) walk(tag);
-    const claudeRules = variantProfile.route.rules.filter(rule => rule.domain_suffix?.includes('claude.ai'));
-    assert.equal(claudeRules[0].action, 'reject');
-    assert.equal(claudeRules[0].network, 'udp');
-    assert.ok(variantProfile.route.rules.indexOf(claudeRules.at(-1)) <
-      variantProfile.route.rules.findIndex(rule => rule.source_mac_address && !rule.domain_suffix));
-    for (const rule of claudeRules.filter(rule => rule.outbound)) {
-      const fixed = nodes.get(rule.outbound);
-      assert.equal(fixed.type, 'socks');
-      assert.ok(fixed.username.includes('-cc-DE-city-berlin-'));
-      assert.ok(!fixed.outbounds);
+    const claudeDomains = new Set(['claude.ai', 'claude.com', 'anthropic.com', 'claudeusercontent.com']);
+    for (const rules of [variantProfile.route.rules, variantProfile.dns.rules]) {
+      assert.ok(rules.every(rule => !(rule.domain_suffix || []).some(domain => claudeDomains.has(domain))));
     }
-    const claudeDns = variantProfile.dns.servers.filter(server => server.tag.startsWith('dns-claude-'));
-    assert.equal(claudeDns.length, variantProfile === simple ? 1 : 3);
-    assert.ok(claudeDns.every(server => nodes.get(server.detour)?.username.includes('-cc-DE-')));
+    assert.ok(variantProfile.dns.servers.every(server => !server.tag.startsWith('dns-claude-')));
   }
 });
