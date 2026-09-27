@@ -1,5 +1,5 @@
 #!/bin/sh
-# Install as /www/cgi-bin/momo-a-update (0700). Secrets live outside /www.
+# Install as /www/cgi-bin/momo-a-update (0755). Secrets live outside /www.
 umask 077
 fail() {
     logger -t momo-a-update "$1"
