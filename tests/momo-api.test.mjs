@@ -165,6 +165,12 @@ test('Momo feed requests only the selected source with its required UA', async (
     assert.deepEqual(JSON.parse(independentResponse.body).outbounds
       .filter(outbound => outbound.tag?.includes('上网模式')).map(outbound => outbound.tag),
     ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO'].map(profileLabels.labelFor));
+    const renewed = { setHeader() {}, end(body) { this.body = body; } };
+    await handler({ method: 'GET', url: `/api/momo?source=B&key=${'a'.repeat(24)}&res_session=renew-test` }, renewed);
+    assert.equal(renewed.statusCode, 200);
+    const renewedDE = JSON.parse(renewed.body).outbounds.find(node => node.tag === '德国 · 柏林（普通住宅）');
+    assert.match(renewedDE.username, /-cc-DE-city-berlin-sessid-[a-f0-9]{16}$/);
+    assert.ok(!renewedDE.username.includes('abc123'));
     process.env.MOMO_EXTRA_PHONES_JSON = JSON.stringify([
       { id: 'OTHER', mac: '02:00:00:00:00:26', ip: '192.168.1.233' },
     ]);
