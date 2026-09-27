@@ -12,6 +12,37 @@ const originalEnv = Object.fromEntries(
     .map(name => [name, process.env[name]]),
 );
 
+test('authenticated local A upload bypasses cloud fetching and keeps validation', async () => {
+  Object.assign(process.env, {
+    MOMO_API_SECRET: 'test-secret', MOMO_FEED_TOKEN: 'a'.repeat(24),
+    MOMO_MIN_A: '1', MOMO_PHONE_MODE_ENABLED: '0',
+  });
+  delete process.env.MOMO_SOURCE_A;
+  globalThis.fetch = async () => { throw new Error('Upload must not fetch'); };
+  const body = 'dns:\n  nameserver: [192.0.2.53]\n  nameserver-policy: {}\nproxies:\n  - name: test\n    type: anytls\n    server: 192.0.2.10\n    port: 443\n    password: test\n';
+  const request = { method: 'POST', url: `/api/momo?source=A&key=${'a'.repeat(24)}`,
+    headers: { 'content-type': 'text/plain; charset=utf-8' }, body };
+  try {
+    for (const [overrides, expected] of [
+      [{}, 200], [{ url: '/api/momo?source=A&key=wrong' }, 403],
+      [{ url: `/api/momo?source=B&key=${'a'.repeat(24)}` }, 400],
+      [{ headers: { 'content-type': 'application/json' }, body: { url: 'https://example.test' } }, 400],
+      [{ body: '' }, 400], [{ body: 'x'.repeat(4_000_001) }, 413],
+    ]) {
+      const response = { setHeader() {}, end(value) { this.body = value; } };
+      await handler({ ...request, ...overrides }, response);
+      assert.equal(response.statusCode, expected);
+      if (expected === 200) assert.equal(JSON.parse(response.body).outbounds
+        .filter(outbound => outbound.tag?.startsWith('A ')).length, 1);
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+    for (const [name, value] of Object.entries(originalEnv)) {
+      if (value === undefined) delete process.env[name]; else process.env[name] = value;
+    }
+  }
+});
+
 test('feed diagnostics classify failures without logging upstream secrets', async () => {
   const oldError = console.error;
   const logs = [];

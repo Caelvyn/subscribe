@@ -35,9 +35,9 @@ async function fetchSubscription(url, userAgent, source) {
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'private, no-store');
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  if (req.method !== 'GET') {
+  if (!['GET', 'POST'].includes(req.method)) {
     res.statusCode = 405;
-    res.setHeader('Allow', 'GET');
+    res.setHeader('Allow', 'GET, POST');
     return res.end('{"error":"Method not allowed"}');
   }
   const params = new URL(req.url, 'https://local.invalid').searchParams;
@@ -51,8 +51,22 @@ export default async function handler(req, res) {
     res.statusCode = 400;
     return res.end('{"error":"Unknown source"}');
   }
+  // The router can fetch A itself when the upstream redirects cloud requests.
+  // Only authenticated raw-text A uploads are accepted; callers cannot supply
+  // URLs, credentials, routing rules, or environment overrides.
+  const uploaded = req.method === 'POST';
+  if (uploaded && (source !== 'A' ||
+      !/^text\/plain(?:\s*;|$)/i.test(req.headers?.['content-type'] || '') ||
+      typeof req.body !== 'string' || !req.body.trim())) {
+    res.statusCode = 400;
+    return res.end('{"error":"Expected an A subscription as text/plain"}');
+  }
+  if (uploaded && Buffer.byteLength(req.body, 'utf8') > 4_000_000) {
+    res.statusCode = 413;
+    return res.end('{"error":"Source too large"}');
+  }
   const { MOMO_SOURCE_A, MOMO_SOURCE_B, MOMO_API_SECRET } = process.env;
-  if ((source !== 'B' && !MOMO_SOURCE_A) ||
+  if ((!uploaded && source !== 'B' && !MOMO_SOURCE_A) ||
       (source !== 'A' && !MOMO_SOURCE_B) || !MOMO_API_SECRET) {
     res.statusCode = 503;
     return res.end('{"error":"Feed is not configured"}');
@@ -61,7 +75,7 @@ export default async function handler(req, res) {
   let aFormat;
   try {
     const [aText, bText] = await Promise.all([
-      source === 'B' ? '' : fetchSubscription(MOMO_SOURCE_A, 'Clash.Meta', 'A'),
+      uploaded ? req.body : source === 'B' ? '' : fetchSubscription(MOMO_SOURCE_A, 'Clash.Meta', 'A'),
       source === 'A' ? '' : fetchSubscription(MOMO_SOURCE_B, 'sing-box', 'B'),
     ]);
     if (aText) {
