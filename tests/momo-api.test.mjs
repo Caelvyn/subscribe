@@ -3,6 +3,7 @@ import test from 'node:test';
 import handler from '../api/momo.js';
 import profileBuilder from '../build-profile.cjs';
 import profileLabels from '../profile-labels.cjs';
+import profileVariants from '../profile-variants.cjs';
 
 const originalFetch = globalThis.fetch;
 const originalEnv = Object.fromEntries(
@@ -26,6 +27,7 @@ test('authenticated local A upload bypasses cloud fetching and keeps validation'
   try {
     for (const [overrides, expected] of [
       [{}, 200], [{ url: '/api/momo?source=A&key=wrong' }, 403],
+      [{ url: `/api/momo?source=A&key=${'a'.repeat(24)}&variant=invalid` }, 400],
       [{ url: `/api/momo?source=B&key=${'a'.repeat(24)}` }, 400],
       [{ headers: { 'content-type': 'application/json' }, body: { url: 'https://example.test' } }, 400],
       [{ body: '' }, 400], [{ body: 'x'.repeat(4_000_001) }, 413],
@@ -308,9 +310,12 @@ test('independent phone selectors retain normal split and isolate both devices',
   assert.ok(profile.dns.rules.some(rule => rule.server === 'dns-ai' &&
     rule.domain_suffix.includes('chatgpt.com')));
 
+  const simple = profileLabels.formatProfile(
+    profileVariants.applyVariant(structuredClone(profile), 'simple', 'B'), 'simple');
+  profileVariants.applyVariant(profile, 'full', 'B');
   profileLabels.formatProfile(profile);
   assert.deepEqual(profile.outbounds.filter(outbound => outbound.type === 'selector')
-    .map(outbound => outbound.tag), Object.values(profileLabels.labels).slice(0, 9));
+    .map(outbound => outbound.tag), Object.values(profileLabels.labels).slice(0, 10));
   const renamedTags = new Set(profile.outbounds.map(outbound => outbound.tag));
   assert.equal(renamedTags.size, profile.outbounds.length);
   const checkReferences = value => {
@@ -331,6 +336,35 @@ test('independent phone selectors retain normal split and isolate both devices',
   assert.ok(renamedTags.has(profile.route.final));
   assert.deepEqual(profile.outbounds[0].outbounds.slice(0, 2),
     ['直连', '02 普通代理 · 住宅国家']);
-  assert.equal(profile.outbounds.find(outbound => outbound.tag === '德国 · 柏林（手机住宅）').username,
+  assert.equal(profile.outbounds.find(outbound => outbound.tag === '德国 · 柏林（一加 6T）').username,
     'customer-test-cc-DE-city-berlin-sessid-abc123');
+  for (const [id, title] of [['6T', '一加 6T'], ['OPPO', 'OPPO A96']]) {
+    const relay = profile.outbounds.find(node => node.tag === profileLabels.labelFor(`PHONE-RELAY-${id}`));
+    assert.ok(relay.outbounds.includes('直连'));
+    assert.equal(relay.outbounds.length, 3);
+    const country = profile.outbounds.find(node => node.tag === profileLabels.labelFor(`PHONE-RESIDENTIAL-${id}`));
+    assert.equal(country.outbounds.length, 5);
+    assert.ok(country.outbounds.every(tag => profile.outbounds.find(node => node.tag === tag).detour === relay.tag));
+    assert.ok(country.outbounds.every(tag => tag.includes(title)));
+  }
+  assert.deepEqual(simple.outbounds.filter(node => node.type === 'selector').map(node => node.tag), [
+    '01 总代理', '02 总代理 · 住宅国家', '03 总住宅中转',
+    '04 一加 6T · 上网模式', '05 OPPO A96 · 上网模式',
+  ]);
+  assert.ok(simple.outbounds.filter(node => node.tag.endsWith('上网模式')).every(node =>
+    JSON.stringify(node.outbounds) === JSON.stringify(['正常分流（国内直连·国外代理）', '02 总代理 · 住宅国家', '直连'])));
+  assert.equal(simple.outbounds.filter(node => node.detour === '03 总住宅中转').length, 5);
+  assert.equal(simple.route.rules.find(rule => rule.domain_suffix?.includes('chatgpt.com')).outbound, '01 总代理');
+  assert.equal(simple.dns.servers.find(server => server.tag === 'dns-ai').detour, '01 总代理');
+  assert.notEqual(simple.experimental.cache_file.cache_id, profile.experimental.cache_file.cache_id);
+  for (const variantProfile of [profile, simple]) {
+    const nodes = new Map(variantProfile.outbounds.map(node => [node.tag, node]));
+    const walk = (tag, path = new Set()) => {
+      assert.ok(nodes.has(tag), `Missing outbound ${tag}`);
+      assert.ok(!path.has(tag), `Cycle at ${tag}`);
+      const node = nodes.get(tag), next = new Set([...path, tag]);
+      for (const child of [...(node.outbounds || []), ...(node.detour ? [node.detour] : [])]) walk(child, next);
+    };
+    for (const tag of nodes.keys()) walk(tag);
+  }
 });

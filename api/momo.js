@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import profileBuilder from '../build-profile.cjs';
 import profileLabels from '../profile-labels.cjs';
+import profileVariants from '../profile-variants.cjs';
 
 const { buildProfile } = profileBuilder;
 
@@ -51,6 +52,11 @@ export default async function handler(req, res) {
   if (!['A', 'B', 'AB'].includes(source)) {
     res.statusCode = 400;
     return res.end('{"error":"Unknown source"}');
+  }
+  const variant = params.get('variant') || 'full';
+  if (!['full', 'simple'].includes(variant)) {
+    res.statusCode = 400;
+    return res.end('{"error":"Unknown variant"}');
   }
   // The router can fetch A itself when the upstream redirects cloud requests.
   // Only authenticated raw-text A uploads are accepted; callers cannot supply
@@ -116,7 +122,8 @@ export default async function handler(req, res) {
       phone,
     );
     res.statusCode = 200;
-    return res.end(JSON.stringify(profileLabels.formatProfile(profile)));
+    return res.end(JSON.stringify(profileLabels.formatProfile(
+      profileVariants.applyVariant(profile, variant, source), variant)));
   } catch (error) {
     // Never log raw errors: upstream parser messages can contain credentials.
     const safeReasons = new Set([
