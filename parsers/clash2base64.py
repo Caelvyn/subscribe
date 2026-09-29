@@ -187,6 +187,7 @@ def clash2v2ray(share_link):
             "flow": share_link.get('flow', ''),
             "packetEncoding": share_link.get('packet-encoding', ''),
             "encryption": share_link.get('encryption', ''),
+            "alpn": quote(','.join(share_link.get('alpn', '')), 'utf-8'),
             'allowInsecure': '1' if share_link.get('skip-cert-verify') == True else '0',
             "name": quote(share_link['name'], 'utf-8')
         }
@@ -197,7 +198,7 @@ def clash2v2ray(share_link):
         if vless_info['type'] == 'ws':
             vless_info["path"] = quote(share_link['ws-opts'].get('path', ''), 'utf-8') if share_link.get('ws-opts') else share_link.get('ws-path', '')
             vless_info["host"] = share_link['ws-opts'].get('headers', {}).get('Host', '') if share_link.get('ws-opts') else share_link.get('ws-headers', {}).get('Host', '')
-            link = "vless://{uuid}@{server}:{port}?encryption=none&security={security}&sni={sni}&fp={fp}&type={type}&host={host}&path={path}&flow={flow}&packetEncoding={packetEncoding}&encryption={encryption}&allowInsecure={allowInsecure}".format(**vless_info)
+            link = "vless://{uuid}@{server}:{port}?encryption=none&security={security}&sni={sni}&fp={fp}&type={type}&host={host}&path={path}&flow={flow}&packetEncoding={packetEncoding}&encryption={encryption}&allowInsecure={allowInsecure}&alpn={alpn}".format(**vless_info)
         elif vless_info['type'] == 'grpc':
             if share_link.get('grpc-opts', {}).get('grpc-service-name', '') not in ['/', ''] :
                 vless_info["serviceName"] = unquote(share_link.get('grpc-opts').get('grpc-service-name'))
