@@ -2,6 +2,7 @@ const YAML = require('yaml');
 const crypto = require('node:crypto');
 const net = require('node:net');
 const template = require('./profile-template.json');
+const exchangeDomains = require('./exchange-domains.cjs');
 
 function need(value, label) {
   if (value === undefined || value === null || value === '') throw new Error(`Missing ${label}`);
@@ -203,9 +204,15 @@ function addIndependentPhoneModes(profile, phone) {
     });
   }
 
-  profile.inbounds.push({ type: 'socks', tag: 'phone-normal-in', listen: '127.0.0.1', listen_port: 10556 });
+  // The 6T has its own loopback path, so exchange routing can exclude it even
+  // after the normal-mode SOCKS hop has replaced the original source MAC.
+  profile.inbounds.push(
+    { type: 'socks', tag: 'phone-normal-in', listen: '127.0.0.1', listen_port: 10556 },
+    { type: 'socks', tag: 'phone-normal-other-in', listen: '127.0.0.1', listen_port: 10557 },
+  );
   profile.outbounds.push(
     { type: 'socks', tag: 'PHONE-NORMAL', server: '127.0.0.1', server_port: 10556, version: '5' },
+    { type: 'socks', tag: 'PHONE-NORMAL-OTHER', server: '127.0.0.1', server_port: 10557, version: '5' },
   );
 
   const routeRules = [];
@@ -223,8 +230,9 @@ function addIndependentPhoneModes(profile, phone) {
       default: countryTags[0], interrupt_exist_connections: true,
     }, {
       type: 'selector', tag: selector,
-      outbounds: ['PHONE-NORMAL', residential, 'DIRECT'],
-      default: 'PHONE-NORMAL', interrupt_exist_connections: true,
+      outbounds: [id === '6T' ? 'PHONE-NORMAL' : 'PHONE-NORMAL-OTHER', residential, 'DIRECT'],
+      default: id === '6T' ? 'PHONE-NORMAL' : 'PHONE-NORMAL-OTHER',
+      interrupt_exist_connections: true,
     });
     profile.dns.servers.push(
       { type: 'https', tag: cnDns, server: '223.5.5.5',
@@ -261,6 +269,44 @@ function addIndependentPhoneModes(profile, phone) {
     profile.outbounds.push({ ...node, tag: `PROXY-${tag}`, detour: 'PROXY-RESIDENTIAL-RELAY' });
   }
   profile.outbounds[0].outbounds = [...relayTags, 'PROXY-RESIDENTIAL'];
+}
+
+function addExchangeGroups(profile, nodeTags, exclude6T) {
+  const isSingapore = tag => /新加坡|狮城|🇸🇬|Singapore|\bSG(?:\b|[-_\d])/i.test(tag);
+  const isJapan = tag => /日本|🇯🇵|Japan|\bJP(?:\b|[-_\d])/i.test(tag);
+  const regionalNodes = [
+    ...nodeTags.filter(isSingapore),
+    ...nodeTags.filter(tag => !isSingapore(tag) && isJapan(tag)),
+  ];
+  if (!regionalNodes.length) throw new Error('No Singapore or Japan airport nodes');
+  const exchanges = [
+    { tag: 'EXCHANGE-OKX', dnsTag: 'dns-okx', suffixes: exchangeDomains.okx },
+    { tag: 'EXCHANGE-BINANCE', dnsTag: 'dns-binance',
+      suffixes: exchangeDomains.binance, exact: exchangeDomains.binanceExact },
+  ];
+  for (const { tag, dnsTag, suffixes, exact } of exchanges) {
+    profile.outbounds.push({
+      type: 'selector', tag, outbounds: regionalNodes,
+      default: regionalNodes[0], interrupt_exist_connections: true,
+    });
+    profile.dns.servers.push({
+      type: 'https', tag: dnsTag, server: '8.8.8.8',
+      tls: { enabled: true, server_name: 'dns.google' }, detour: tag,
+    });
+    const domainMatch = { domain_suffix: suffixes };
+    if (exact) domainMatch.domain = exact;
+    // The 6T keeps its selected mode. Its normal mode re-enters through this
+    // dedicated inbound; other devices, including A96, may use these groups.
+    const routeRule = exclude6T ? {
+      type: 'logical', mode: 'and',
+      rules: [domainMatch, { inbound: 'phone-normal-in', invert: true }],
+      action: 'route', outbound: tag,
+    } : { ...domainMatch, action: 'route', outbound: tag };
+    const routeIndex = profile.route.rules.findIndex(rule => rule.rule_set === 'geosite-cn');
+    profile.route.rules.splice(routeIndex, 0, routeRule);
+    const dnsIndex = profile.dns.rules.findIndex(rule => rule.rule_set === 'geosite-cn');
+    profile.dns.rules.splice(dnsIndex, 0, { ...domainMatch, action: 'route', server: dnsTag });
+  }
 }
 
 function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, source = 'AB', wanInterface = 'pppoe-wan', phone) {
@@ -309,6 +355,8 @@ function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, so
     tls: { enabled: true, server_name: 'dns.google' }, detour: 'AI-SERVICES' });
   profile.dns.rules.splice(3, 0, { domain_suffix: aiDomains, action: 'route', server: 'dns-ai' });
   profile.route.rules.splice(7, 0, { domain_suffix: aiDomains, action: 'route', outbound: 'AI-SERVICES' });
+  addExchangeGroups(profile, nodeTags,
+    phone?.independent === true && phone.devices?.some(device => device.id === '6T'));
   addPhoneMode(profile, phone);
   return profile;
 }
