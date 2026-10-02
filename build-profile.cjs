@@ -127,7 +127,8 @@ function addPhoneMode(profile, phone) {
     version: '5', username, password, network: 'tcp', domain_resolver: 'dns-cn',
   });
   profile.dns.servers.push({
-    type: 'https', tag: 'dns-phone-residential', server: '1.1.1.1',
+    type: 'https', tag: 'dns-phone-residential', server: '8.8.8.8',
+    tls: { enabled: true, server_name: 'dns.google' },
     detour: 'PHONE-RESIDENTIAL',
   });
   profile.dns.rules.splice(1, 0,
@@ -223,7 +224,8 @@ function addIndependentPhoneModes(profile, phone) {
     profile.dns.servers.push(
       { type: 'https', tag: cnDns, server: '223.5.5.5',
         tls: { enabled: true, server_name: 'dns.alidns.com' }, detour: selector },
-      { type: 'https', tag: globalDns, server: '1.1.1.1', detour: selector },
+      { type: 'https', tag: globalDns, server: '8.8.8.8',
+        tls: { enabled: true, server_name: 'dns.google' }, detour: selector },
     );
     for (const match of matches) {
       routeRules.push({ ...match, action: 'route', outbound: selector });
@@ -298,7 +300,8 @@ function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, so
     outbounds: ['PROXY', ...nodeTags.filter(tag => !/(香港|🇭🇰|Hong\s*Kong|\bHK\b)/i.test(tag)), 'DIRECT'],
     default: 'PROXY', interrupt_exist_connections: true,
   });
-  profile.dns.servers.push({ type: 'https', tag: 'dns-ai', server: '1.1.1.1', detour: 'AI-SERVICES' });
+  profile.dns.servers.push({ type: 'https', tag: 'dns-ai', server: '8.8.8.8',
+    tls: { enabled: true, server_name: 'dns.google' }, detour: 'AI-SERVICES' });
   profile.dns.rules.splice(3, 0, { domain_suffix: aiDomains, action: 'route', server: 'dns-ai' });
   profile.route.rules.splice(7, 0, { domain_suffix: aiDomains, action: 'route', outbound: 'AI-SERVICES' });
   addPhoneMode(profile, phone);
