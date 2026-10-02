@@ -145,7 +145,7 @@ function addPhoneMode(profile, phone) {
 }
 
 function addIndependentPhoneModes(profile, phone) {
-  const { server, port, username, password, devices } = phone;
+  const { server, port, username, password, devices, usSessionRevision } = phone;
   if (![server, port, username, password].every(value => value !== undefined && value !== '') ||
       !Array.isArray(devices) || devices.length === 0) {
     throw new Error('Incomplete independent phone settings');
@@ -190,6 +190,11 @@ function addIndependentPhoneModes(profile, phone) {
     if (code !== 'DE') {
       countryUsername = countryUsername.replace(/-sessid-([a-z0-9]+)(?=-|$)/i,
         (_, id) => `-sessid-${id}${code}`);
+    }
+    if (code === 'US' && usSessionRevision) {
+      countryUsername = countryUsername.replace(/-sessid-([a-z0-9]+)(?=-|$)/i,
+        (_, id) => `-sessid-${crypto.createHash('sha256')
+          .update(`${id}:${usSessionRevision}`).digest('hex').slice(0, 16)}`);
     }
     profile.outbounds.push({
       type: 'socks', tag: `RES-${code}-${cityLabels[code]}`, server, server_port: Number(port),

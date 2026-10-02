@@ -171,6 +171,22 @@ test('Momo feed requests only the selected source with its required UA', async (
     const renewedDE = JSON.parse(renewed.body).outbounds.find(node => node.tag === '德国 · 柏林（普通住宅）');
     assert.match(renewedDE.username, /-cc-DE-city-berlin-sessid-[a-f0-9]{16}$/);
     assert.ok(!renewedDE.username.includes('abc123'));
+    const usOnly = { setHeader() {}, end(body) { this.body = body; } };
+    await handler({ method: 'GET', url: `/api/momo?source=B&key=${'a'.repeat(24)}&res_session_us=us-test` }, usOnly);
+    assert.equal(usOnly.statusCode, 200);
+    const beforeCountries = JSON.parse(independentResponse.body).outbounds
+      .filter(node => node.type === 'socks' && /-cc-(DE|GB|US|JP|PH)(?:-|$)/i.test(node.username || ''));
+    const afterCountries = JSON.parse(usOnly.body).outbounds;
+    for (const before of beforeCountries) {
+      const after = afterCountries.find(node => node.tag === before.tag);
+      assert.ok(after);
+      if (/-cc-US(?:-|$)/i.test(before.username)) {
+        assert.notEqual(after.username, before.username);
+        assert.match(after.username, /-cc-US-city-new_york-sessid-[a-f0-9]{16}$/);
+      } else {
+        assert.equal(after.username, before.username);
+      }
+    }
     process.env.MOMO_EXTRA_PHONES_JSON = JSON.stringify([
       { id: 'OTHER', mac: '02:00:00:00:00:26', ip: '192.168.1.233' },
     ]);
