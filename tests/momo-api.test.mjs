@@ -21,7 +21,7 @@ test('authenticated local A upload bypasses cloud fetching and keeps validation'
   });
   delete process.env.MOMO_SOURCE_A;
   globalThis.fetch = async () => { throw new Error('Upload must not fetch'); };
-  const body = 'dns:\n  nameserver: [192.0.2.53]\n  nameserver-policy: {}\nproxies:\n  - name: test\n    type: anytls\n    server: 192.0.2.10\n    port: 443\n    password: test\n';
+  const body = 'dns:\n  nameserver: [192.0.2.53]\n  nameserver-policy: {}\nproxies:\n  - name: 日本 test\n    type: anytls\n    server: 192.0.2.10\n    port: 443\n    password: test\n';
   const request = { method: 'POST', url: `/api/momo?source=A&key=${'a'.repeat(24)}`,
     headers: { 'content-type': 'text/plain; charset=utf-8' }, body };
   try {
@@ -107,9 +107,9 @@ test('Momo feed requests only the selected source with its required UA', async (
     return {
       ok: true,
       text: async () => url.endsWith('/a') && options.headers['User-Agent'] === 'Clash.Meta'
-        ? 'dns:\n  nameserver:\n    - https://192.0.2.53/dns-query\n  nameserver-policy:\n    "+.example.test":\n      - https://resolver.example.test:2096/query#skip-cert-verify=true\nproxies:\n  - name: A1\n    type: anytls\n    server: a.example.test\n    port: 443\n    password: test\n    sni: a.example.test\n  - name: A2\n    type: hysteria2\n    server: h.example.test\n    port: 4000\n    ports: 4000-4010\n    password: test2\n'
+        ? 'dns:\n  nameserver:\n    - https://192.0.2.53/dns-query\n  nameserver-policy:\n    "+.example.test":\n      - https://resolver.example.test:2096/query#skip-cert-verify=true\nproxies:\n  - name: 日本 A1\n    type: anytls\n    server: a.example.test\n    port: 443\n    password: test\n    sni: a.example.test\n  - name: A2\n    type: hysteria2\n    server: h.example.test\n    port: 4000\n    ports: 4000-4010\n    password: test2\n'
         : JSON.stringify({ outbounds: [
-          { type: 'anytls', tag: 'B1', server: 'b.example.test', server_port: 443, password: 'test' },
+          { type: 'anytls', tag: '日本 B1', server: 'b.example.test', server_port: 443, password: 'test' },
         ] }),
     };
   };
@@ -207,7 +207,7 @@ test('Momo feed requests only the selected source with its required UA', async (
 
 test('phone modes scope residential and direct routing to the 2.4G MAC', () => {
   const profile = profileBuilder.buildProfile('', JSON.stringify({ outbounds: [
-    { type: 'anytls', tag: 'B1', server: 'b.example.test', server_port: 443, password: 'test' },
+    { type: 'anytls', tag: '日本 B1', server: 'b.example.test', server_port: 443, password: 'test' },
   ] }), 'api-secret', 0, 1, 'B', 'pppoe-wan', {
     mac: '02:00:00:00:00:24', ip: '192.168.1.231', server: 'proxy.example.test', port: '7777',
     username: 'test-user', password: 'test-password',
@@ -247,7 +247,8 @@ test('phone modes scope residential and direct routing to the 2.4G MAC', () => {
 
 test('independent phone selectors retain normal split and isolate both devices', () => {
   const profile = profileBuilder.buildProfile('', JSON.stringify({ outbounds: [
-    { type: 'anytls', tag: 'B1', server: 'b.example.test', server_port: 443, password: 'test' },
+    { type: 'anytls', tag: '日本 B1', server: 'b.example.test', server_port: 443, password: 'test' },
+    { type: 'anytls', tag: '新加坡 SG 1', server: 'sg.example.test', server_port: 443, password: 'test' },
     { type: 'anytls', tag: '香港 HK', server: 'hk.example.test', server_port: 443, password: 'test' },
   ] }), 'api-secret', 0, 1, 'B', 'pppoe-wan', {
     independent: true, server: 'proxy.example.test', port: '7777',
@@ -259,14 +260,20 @@ test('independent phone selectors retain normal split and isolate both devices',
   });
   const selectors = profile.outbounds.filter(outbound => outbound.tag?.startsWith('PHONE-SELECT-'));
   assert.deepEqual(selectors.map(outbound => outbound.tag), ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO']);
-  assert.ok(selectors.every(outbound => outbound.default === 'PHONE-NORMAL' &&
+  assert.deepEqual(selectors.map(outbound => outbound.outbounds[0]),
+    ['PHONE-NORMAL', 'PHONE-NORMAL-OTHER']);
+  assert.ok(selectors.every(outbound => outbound.default === outbound.outbounds[0] &&
     outbound.interrupt_exist_connections === true &&
-    JSON.stringify(outbound.outbounds) === JSON.stringify(['PHONE-NORMAL',
+    JSON.stringify(outbound.outbounds.slice(1)) === JSON.stringify([
       outbound.tag.replace('PHONE-SELECT-', 'PHONE-RESIDENTIAL-'), 'DIRECT'])));
   assert.deepEqual(profile.inbounds.find(inbound => inbound.tag === 'phone-normal-in'),
     { type: 'socks', tag: 'phone-normal-in', listen: '127.0.0.1', listen_port: 10556 });
+  assert.deepEqual(profile.inbounds.find(inbound => inbound.tag === 'phone-normal-other-in'),
+    { type: 'socks', tag: 'phone-normal-other-in', listen: '127.0.0.1', listen_port: 10557 });
   assert.deepEqual(profile.outbounds.find(outbound => outbound.tag === 'PHONE-NORMAL'),
     { type: 'socks', tag: 'PHONE-NORMAL', server: '127.0.0.1', server_port: 10556, version: '5' });
+  assert.deepEqual(profile.outbounds.find(outbound => outbound.tag === 'PHONE-NORMAL-OTHER'),
+    { type: 'socks', tag: 'PHONE-NORMAL-OTHER', server: '127.0.0.1', server_port: 10557, version: '5' });
   const phoneRoutes = profile.route.rules.filter(rule => rule.outbound?.startsWith('PHONE-SELECT-'));
   assert.deepEqual(phoneRoutes.map(rule => rule.outbound),
     ['PHONE-SELECT-6T', 'PHONE-SELECT-OPPO']);
@@ -331,13 +338,35 @@ test('independent phone selectors retain normal split and isolate both devices',
     rule.domain_suffix.includes('chatgpt.com')));
   assert.ok(profile.dns.rules.some(rule => rule.server === 'dns-ai' &&
     rule.domain_suffix.includes('chatgpt.com')));
+  for (const [exchange, domain] of [['EXCHANGE-OKX', 'okx.com'],
+    ['EXCHANGE-BINANCE', 'binance.com']]) {
+    const group = profile.outbounds.find(outbound => outbound.tag === exchange);
+    assert.equal(group.default, group.outbounds[0]);
+    assert.equal(group.outbounds.length, 2);
+    assert.ok(group.outbounds[0].includes('新加坡'));
+    assert.ok(group.outbounds[1].includes('日本'));
+    assert.ok(group.outbounds.every(tag => !tag.includes('香港')));
+    const rule = profile.route.rules.find(candidate => candidate.outbound === exchange);
+    assert.equal(rule.type, 'logical');
+    assert.equal(rule.mode, 'and');
+    assert.ok(rule.rules[0].domain_suffix.includes(domain));
+    assert.deepEqual(rule.rules[1], { inbound: 'phone-normal-in', invert: true });
+    assert.ok(profile.route.rules.indexOf(rule) > profile.route.rules.indexOf(phoneRoutes[0]));
+    assert.ok(profile.route.rules.indexOf(rule) <
+      profile.route.rules.findIndex(candidate => candidate.rule_set === 'geosite-cn'));
+    const dns = profile.dns.servers.find(server => server.detour === exchange);
+    assert.ok(profile.dns.rules.some(candidate => candidate.server === dns.tag &&
+      candidate.domain_suffix.includes(domain)));
+  }
+  assert.ok(profile.route.rules.find(rule => rule.outbound === 'EXCHANGE-BINANCE')
+    .rules[0].domain.includes('zftksc.launches.appsflyersdk.com'));
 
   const simple = profileLabels.formatProfile(
     profileVariants.applyVariant(structuredClone(profile), 'simple', 'B'), 'simple');
   profileVariants.applyVariant(profile, 'full', 'B');
   profileLabels.formatProfile(profile);
   assert.deepEqual(profile.outbounds.filter(outbound => outbound.type === 'selector')
-    .map(outbound => outbound.tag), Object.values(profileLabels.labels).slice(0, 10));
+    .map(outbound => outbound.tag), Object.values(profileLabels.labels).slice(0, 12));
   const renamedTags = new Set(profile.outbounds.map(outbound => outbound.tag));
   assert.equal(renamedTags.size, profile.outbounds.length);
   const checkReferences = value => {
@@ -363,7 +392,7 @@ test('independent phone selectors retain normal split and isolate both devices',
   for (const [id, title] of [['6T', '一加 6T'], ['OPPO', 'OPPO A96']]) {
     const relay = profile.outbounds.find(node => node.tag === profileLabels.labelFor(`PHONE-RELAY-${id}`));
     assert.ok(relay.outbounds.includes('直连'));
-    assert.equal(relay.outbounds.length, 3);
+    assert.equal(relay.outbounds.length, 4);
     const country = profile.outbounds.find(node => node.tag === profileLabels.labelFor(`PHONE-RESIDENTIAL-${id}`));
     assert.equal(country.outbounds.length, 5);
     assert.ok(country.outbounds.every(tag => profile.outbounds.find(node => node.tag === tag).detour === relay.tag));
@@ -371,16 +400,23 @@ test('independent phone selectors retain normal split and isolate both devices',
   }
   assert.deepEqual(simple.outbounds.filter(node => node.type === 'selector').map(node => node.tag), [
     '01 总代理', '02 一加 6T · 上网模式', '03 OPPO A96 · 上网模式',
-    '04 总代理 · 住宅国家', '05 总住宅中转', '06 ChatGPT',
+    '04 总代理 · 住宅国家', '05 总住宅中转', '06 ChatGPT', '07 OKX', '08 Binance',
   ]);
-  assert.ok(simple.outbounds.filter(node => node.tag.endsWith('上网模式')).every(node =>
-    JSON.stringify(node.outbounds) === JSON.stringify(['正常分流', '04 总代理 · 住宅国家', '直连'])));
+  assert.deepEqual(simple.outbounds.filter(node => node.tag.endsWith('上网模式'))
+    .map(node => node.outbounds), [
+      ['正常分流', '04 总代理 · 住宅国家', '直连'],
+      ['正常分流 · 其他设备', '04 总代理 · 住宅国家', '直连'],
+    ]);
   assert.equal(simple.outbounds.filter(node => node.detour === '05 总住宅中转').length, 5);
   const chatgptRule = simple.route.rules.find(rule => rule.domain_suffix?.includes('chatgpt.com'));
   assert.equal(chatgptRule.outbound, '06 ChatGPT');
   assert.ok(['claude.ai', 'anthropic.com', 'gemini.google.com', 'generativelanguage.googleapis.com']
     .every(domain => !chatgptRule.domain_suffix.includes(domain)));
   assert.equal(simple.dns.servers.find(server => server.tag === 'dns-ai').detour, '06 ChatGPT');
+  assert.ok(simple.route.rules.some(rule => rule.outbound === '07 OKX' &&
+    rule.rules[1].inbound === 'phone-normal-in'));
+  assert.ok(simple.route.rules.some(rule => rule.outbound === '08 Binance' &&
+    rule.rules[1].inbound === 'phone-normal-in'));
   assert.notEqual(simple.experimental.cache_file.cache_id, profile.experimental.cache_file.cache_id);
   for (const variantProfile of [profile, simple]) {
     const nodes = new Map(variantProfile.outbounds.map(node => [node.tag, node]));
