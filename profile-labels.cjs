@@ -13,6 +13,7 @@ const labels = {
   'AI-SERVICES': '10 ChatGPT',
   'EXCHANGE-OKX': '11 OKX',
   'EXCHANGE-BINANCE': '12 Binance',
+  TIKTOK: '13 TikTok',
   'RESIDENTIAL-RELAY': '08 两台手机 · 共用住宅中转',
   'PHONE-NORMAL': '正常分流',
   'PHONE-NORMAL-OTHER': '正常分流 · 其他设备',
@@ -29,7 +30,7 @@ for (const [tag, city] of Object.entries({
   labels[`6T-${tag}`] = `${city}（一加 6T）`;
   labels[`OPPO-${tag}`] = `${city}（OPPO A96）`;
 }
-const selectorOrder = Object.keys(labels).slice(0, 12);
+const selectorOrder = Object.keys(labels).slice(0, 13);
 const simpleLabels = {
   ...labels,
   PROXY: '01 总代理',
@@ -40,6 +41,7 @@ const simpleLabels = {
   'AI-SERVICES': '06 ChatGPT',
   'EXCHANGE-OKX': '07 OKX',
   'EXCHANGE-BINANCE': '08 Binance',
+  TIKTOK: '09 TikTok',
 };
 for (const tag of Object.keys(simpleLabels).filter(tag => tag.startsWith('PROXY-RES-'))) {
   simpleLabels[tag] = simpleLabels[tag].replace('（普通住宅）', '（共用住宅）');
@@ -60,7 +62,7 @@ function formatProfile(profile, variant = 'full') {
   rename(profile);
   const order = (variant === 'simple' ? ['PROXY', 'PHONE-SELECT-6T', 'PHONE-SELECT-OPPO',
     'PROXY-RESIDENTIAL', 'PROXY-RESIDENTIAL-RELAY', 'AI-SERVICES',
-    'EXCHANGE-OKX', 'EXCHANGE-BINANCE'] : selectorOrder).map(display);
+    'EXCHANGE-OKX', 'EXCHANGE-BINANCE', 'TIKTOK'] : selectorOrder).map(display);
   const rank = outbound => {
     const index = order.indexOf(outbound.tag);
     return index >= 0 ? index : outbound.type === 'selector' ? order.length : order.length + 1;

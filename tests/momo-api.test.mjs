@@ -360,13 +360,28 @@ test('independent phone selectors retain normal split and isolate both devices',
   }
   assert.ok(profile.route.rules.find(rule => rule.outbound === 'EXCHANGE-BINANCE')
     .rules[0].domain.includes('zftksc.launches.appsflyersdk.com'));
+  const tiktok = profile.outbounds.find(node => node.tag === 'TIKTOK');
+  assert.equal(tiktok.outbounds.length, 2);
+  assert.ok(!tiktok.outbounds.includes(hkTag));
+  assert.ok(!tiktok.outbounds.includes('PROXY') && !tiktok.outbounds.includes('DIRECT'));
+  const tiktokRule = profile.route.rules.find(rule => rule.outbound === 'TIKTOK');
+  assert.ok(tiktokRule.domain_suffix.includes('tiktok.com'));
+  assert.ok(tiktokRule.domain.includes('p16-tiktok-dm-sticker-sign-sg.ibyteimg.com'));
+  assert.ok(profile.route.rules.indexOf(tiktokRule) > profile.route.rules.indexOf(phoneRoutes[0]));
+  assert.ok(profile.route.rules.indexOf(tiktokRule) <
+    profile.route.rules.findIndex(rule => rule.rule_set === 'geosite-cn'));
+  const tiktokDnsIndex = profile.dns.rules.findIndex(rule => rule.server === 'dns-tiktok');
+  assert.ok(tiktokDnsIndex > profile.dns.rules.findIndex(rule => rule.source_mac_address));
+  assert.ok(tiktokDnsIndex < profile.dns.rules.findIndex(rule =>
+    rule.rule_set === 'geosite-cn' && !rule.source_mac_address));
+  assert.equal(profile.dns.servers.find(server => server.tag === 'dns-tiktok').detour, 'TIKTOK');
 
   const simple = profileLabels.formatProfile(
     profileVariants.applyVariant(structuredClone(profile), 'simple', 'B'), 'simple');
   profileVariants.applyVariant(profile, 'full', 'B');
   profileLabels.formatProfile(profile);
   assert.deepEqual(profile.outbounds.filter(outbound => outbound.type === 'selector')
-    .map(outbound => outbound.tag), Object.values(profileLabels.labels).slice(0, 12));
+    .map(outbound => outbound.tag), Object.values(profileLabels.labels).slice(0, 13));
   const renamedTags = new Set(profile.outbounds.map(outbound => outbound.tag));
   assert.equal(renamedTags.size, profile.outbounds.length);
   const checkReferences = value => {
@@ -400,7 +415,7 @@ test('independent phone selectors retain normal split and isolate both devices',
   }
   assert.deepEqual(simple.outbounds.filter(node => node.type === 'selector').map(node => node.tag), [
     '01 总代理', '02 一加 6T · 上网模式', '03 OPPO A96 · 上网模式',
-    '04 总代理 · 住宅国家', '05 总住宅中转', '06 ChatGPT', '07 OKX', '08 Binance',
+    '04 总代理 · 住宅国家', '05 总住宅中转', '06 ChatGPT', '07 OKX', '08 Binance', '09 TikTok',
   ]);
   assert.deepEqual(simple.outbounds.filter(node => node.tag.endsWith('上网模式'))
     .map(node => node.outbounds), [
@@ -413,6 +428,7 @@ test('independent phone selectors retain normal split and isolate both devices',
   assert.ok(['claude.ai', 'anthropic.com', 'gemini.google.com', 'generativelanguage.googleapis.com']
     .every(domain => !chatgptRule.domain_suffix.includes(domain)));
   assert.equal(simple.dns.servers.find(server => server.tag === 'dns-ai').detour, '06 ChatGPT');
+  assert.equal(simple.dns.servers.find(server => server.tag === 'dns-tiktok').detour, '09 TikTok');
   assert.ok(simple.route.rules.some(rule => rule.outbound === '07 OKX' &&
     rule.rules[1].inbound === 'phone-normal-in'));
   assert.ok(simple.route.rules.some(rule => rule.outbound === '08 Binance' &&
@@ -433,4 +449,17 @@ test('independent phone selectors retain normal split and isolate both devices',
     }
     assert.ok(variantProfile.dns.servers.every(server => !server.tag.startsWith('dns-claude-')));
   }
+});
+
+test('TikTok excludes Hong Kong aliases and keeps only concrete non-HK nodes', () => {
+  const names = ['香港', '🇭🇰 01', 'Hong Kong', 'Hong_Kong', 'HK01', 'HK-02', 'HKG', '香江',
+    '日本', '新加坡', '美国'];
+  const profile = profileBuilder.buildProfile('', JSON.stringify({ outbounds: names.map(tag => ({
+    type: 'anytls', tag, server: 'example.test', server_port: 443, password: 'test',
+  })) }), 'api-secret', 0, 1, 'B');
+  const tiktok = profile.outbounds.find(node => node.tag === 'TIKTOK');
+  assert.deepEqual(tiktok.outbounds, profile.outbounds.filter(node => node.type === 'anytls')
+    .slice(-3).map(node => node.tag));
+  assert.equal(tiktok.default, tiktok.outbounds[0]);
+  assert.ok(tiktok.outbounds.every(tag => profile.outbounds.find(node => node.tag === tag).type === 'anytls'));
 });

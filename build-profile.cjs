@@ -3,6 +3,7 @@ const crypto = require('node:crypto');
 const net = require('node:net');
 const template = require('./profile-template.json');
 const exchangeDomains = require('./exchange-domains.cjs');
+const tiktokDomains = require('./tiktok-domains.cjs');
 
 function need(value, label) {
   if (value === undefined || value === null || value === '') throw new Error(`Missing ${label}`);
@@ -309,6 +310,24 @@ function addExchangeGroups(profile, nodeTags, exclude6T) {
   }
 }
 
+function addTikTokGroup(profile, nodeTags) {
+  const nodes = nodeTags.filter(tag => !/(香港|香江|🇭🇰|Hong[\s_-]*Kong|\bHK(?:G)?(?:\b|[-_\d]))/i.test(tag));
+  if (!nodes.length) throw new Error('No non-Hong Kong airport nodes');
+  profile.outbounds.push({
+    type: 'selector', tag: 'TIKTOK', outbounds: nodes,
+    default: nodes[0], interrupt_exist_connections: true,
+  });
+  profile.dns.servers.push({
+    type: 'https', tag: 'dns-tiktok', server: '8.8.8.8',
+    tls: { enabled: true, server_name: 'dns.google' }, detour: 'TIKTOK',
+  });
+  const match = { domain_suffix: tiktokDomains.suffixes, domain: tiktokDomains.exact };
+  const routeIndex = profile.route.rules.findIndex(rule => rule.rule_set === 'geosite-cn');
+  profile.route.rules.splice(routeIndex, 0, { ...match, action: 'route', outbound: 'TIKTOK' });
+  const dnsIndex = profile.dns.rules.findIndex(rule => rule.rule_set === 'geosite-cn');
+  profile.dns.rules.splice(dnsIndex, 0, { ...match, action: 'route', server: 'dns-tiktok' });
+}
+
 function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, source = 'AB', wanInterface = 'pppoe-wan', phone) {
   if (!['A', 'B', 'AB'].includes(source)) throw new Error('Unknown source');
   let aNodes = [];
@@ -357,6 +376,7 @@ function buildProfile(aText, bText, apiSecret, minimumA = 61, minimumB = 118, so
   profile.route.rules.splice(7, 0, { domain_suffix: aiDomains, action: 'route', outbound: 'AI-SERVICES' });
   addExchangeGroups(profile, nodeTags,
     phone?.independent === true && phone.devices?.some(device => device.id === '6T'));
+  addTikTokGroup(profile, nodeTags);
   addPhoneMode(profile, phone);
   return profile;
 }
