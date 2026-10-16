@@ -147,7 +147,8 @@ function addPhoneMode(profile, phone) {
 }
 
 function addIndependentPhoneModes(profile, phone) {
-  const { server, port, username, password, devices, usSessionRevision } = phone;
+  const { server, port, username, password, devices, usSessionRevision,
+    deSessionRevision, deIpVersion } = phone;
   if (![server, port, username, password].every(value => value !== undefined && value !== '') ||
       !Array.isArray(devices) || devices.length === 0) {
     throw new Error('Incomplete independent phone settings');
@@ -197,6 +198,17 @@ function addIndependentPhoneModes(profile, phone) {
       countryUsername = countryUsername.replace(/-sessid-([a-z0-9]+)(?=-|$)/i,
         (_, id) => `-sessid-${crypto.createHash('sha256')
           .update(`${id}:${usSessionRevision}`).digest('hex').slice(0, 16)}`);
+    }
+    if (code === 'DE') {
+      if (deSessionRevision) {
+        countryUsername = countryUsername.replace(/-sessid-([a-z0-9]+)(?=-|$)/i,
+          (_, id) => `-sessid-${crypto.createHash('sha256')
+            .update(`${id}:${deSessionRevision}`).digest('hex').slice(0, 16)}`);
+      }
+      if (deIpVersion) {
+        if (!['4', '6'].includes(String(deIpVersion))) throw new Error('Invalid German IP version');
+        countryUsername = countryUsername.replace(/-ipversion-[46](?=-|$)/gi, '') + `-ipversion-${deIpVersion}`;
+      }
     }
     profile.outbounds.push({
       type: 'socks', tag: `RES-${code}-${cityLabels[code]}`, server, server_port: Number(port),

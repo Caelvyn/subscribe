@@ -187,6 +187,32 @@ test('Momo feed requests only the selected source with its required UA', async (
         assert.equal(after.username, before.username);
       }
     }
+    for (const variant of ['full', 'simple']) {
+      const base = { setHeader() {}, end(body) { this.body = body; } };
+      const changed = { setHeader() {}, end(body) { this.body = body; } };
+      const url = `/api/momo?source=B&variant=${variant}&key=${'a'.repeat(24)}`;
+      await handler({ method: 'GET', url }, base);
+      await handler({ method: 'GET', url: url + '&res_session_de=de-test&res_ipversion_de=6' }, changed);
+      assert.equal(changed.statusCode, 200);
+      const before = JSON.parse(base.body), after = JSON.parse(changed.body);
+      let germanNodes = 0;
+      for (let i = 0; i < before.outbounds.length; i++) {
+        const old = before.outbounds[i], current = after.outbounds[i];
+        if (old.type === 'socks' && /-cc-DE(?:-|$)/i.test(old.username || '')) {
+          germanNodes++;
+          assert.match(current.username, /-sessid-[a-f0-9]{16}-ipversion-6$/);
+          assert.notEqual(current.username, old.username);
+          current.username = old.username;
+        }
+      }
+      assert.ok(germanNodes > 0);
+      assert.deepEqual(after, before, 'German options must preserve all other configuration');
+    }
+    for (const query of ['res_ipversion_de=5', 'res_ipversion_de=', 'res_session_de=', 'res_session_de=bad%20value']) {
+      const response = { setHeader() {}, end(body) { this.body = body; } };
+      await handler({ method: 'GET', url: `/api/momo?source=B&key=${'a'.repeat(24)}&${query}` }, response);
+      assert.equal(response.statusCode, 400);
+    }
     process.env.MOMO_EXTRA_PHONES_JSON = JSON.stringify([
       { id: 'OTHER', mac: '02:00:00:00:00:26', ip: '192.168.1.233' },
     ]);

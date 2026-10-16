@@ -68,6 +68,13 @@ export default async function handler(req, res) {
     res.statusCode = 400;
     return res.end('{"error":"Invalid US residential session revision"}');
   }
+  const residentialSessionDE = params.get('res_session_de');
+  const residentialIpVersionDE = params.get('res_ipversion_de');
+  if ((residentialSessionDE !== null && !/^[a-z0-9-]{1,32}$/i.test(residentialSessionDE)) ||
+      (residentialIpVersionDE !== null && !['4', '6'].includes(residentialIpVersionDE))) {
+    res.statusCode = 400;
+    return res.end('{"error":"Invalid German residential options"}');
+  }
   // The router can fetch A itself when the upstream redirects cloud requests.
   // Only authenticated raw-text A uploads are accepted; callers cannot supply
   // URLs, credentials, routing rules, or environment overrides.
@@ -109,6 +116,8 @@ export default async function handler(req, res) {
       username: process.env.MOMO_RESIDENTIAL_USERNAME,
       password: process.env.MOMO_RESIDENTIAL_PASSWORD,
       usSessionRevision: residentialSessionUS,
+      deSessionRevision: residentialSessionDE,
+      deIpVersion: residentialIpVersionDE,
     } : undefined;
     if (phone && residentialSession) {
       phone.username = phone.username?.replace(/-sessid-([a-z0-9]+)(?=-|$)/i,
